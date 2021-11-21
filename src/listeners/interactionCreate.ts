@@ -1,7 +1,7 @@
 import { Listener } from '@sapphire/framework';
 import type { Interaction } from 'discord.js';
 import { list } from '#data/characters';
-import { didyoumean3 } from 'didyoumean3';
+import fuzzy from 'fuzzy';
 
 export class InteractionCreate extends Listener<'interactionCreate'> {
 	public async run(interaction: Interaction) {
@@ -35,8 +35,8 @@ export class InteractionCreate extends Listener<'interactionCreate'> {
 					return;
 				}
 
-				const matched = didyoumean3(focused, list);
-				const arr = matched.matched.map((res: Record<string, any>) => res.target);
+				const matched = fuzzy.filter(focused, list);
+				const arr = matched.map((res) => res.string);
 
 				await interaction.respond(arr.map((choice: string) => ({ name: choice, value: choice })));
 			}

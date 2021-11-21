@@ -5,3 +5,9 @@ declare module '@sapphire/framework' {
 		slashCommands: SlashCommandStore;
 	}
 }
+
+declare namespace NodeJS {
+	interface ProcessEnv {
+		DISCORD_TOKEN: string;
+	}
+}

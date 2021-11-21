@@ -4,14 +4,15 @@ import { blue, gray, green, white, red } from 'colorette';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version } = require('../../package');
 
 @ApplyOptions<ListenerOptions>({ once: true })
 export class Ready extends Listener<'ready'> {
 	public async run() {
 		await this.createSlashCommands();
-		await this.printBanner();
 
+		this.printBanner();
 		this.printStoreDebugInformation();
 	}
 

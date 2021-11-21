@@ -174,6 +174,8 @@ export class Character extends SlashCommand {
 						break;
 					default:
 				}
+
+				await i.deferUpdate();
 			})
 			.on('end', async () => {
 				await m.edit({ content: 'This interaction has ended.', components: [] });

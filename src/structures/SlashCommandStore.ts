@@ -9,14 +9,7 @@ export class SlashCommandStore extends Store<SlashCommand> {
 	public async registerCommands(): Promise<void> {
 		const { client, stores } = this.container;
 		const slashCommands = stores.get('slashCommands');
-		const [guildCmds, globalCmds] = slashCommands.partition((c) => c.guildOnly);
-		const guilds = await client.guilds.fetch();
-
-		for (const [id] of guilds) {
-			const guild = await client.guilds.fetch(id);
-
-			await guild.commands.set(guildCmds.map((c) => c.commandData));
-		}
+		const [, globalCmds] = slashCommands.partition((c) => c.guildOnly);
 
 		const testGuild = await client.guilds.fetch('790439279952003123');
 
