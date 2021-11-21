@@ -83,59 +83,57 @@ export class Character extends SlashCommand {
 			.setDescription(character.talentMaterials)
 			.setColor(character.color);
 		const id = randomUUID();
-		const select = new MessageActionRow().addComponents(
-			new MessageSelectMenu().setCustomId(id).addOptions([
-				{
-					label: 'General Information',
-					description: 'The basic information of the character.',
-					value: 'info',
-					emoji: 'ℹ️'
-				},
-				{
-					label: 'Story',
-					description: 'The story / lore of the character.',
-					value: 'story',
-					emoji: '📖'
-				},
-				{
-					label: 'Talents',
-					description: 'The talents of the character.',
-					value: 'talents',
-					emoji: '🖌️'
-				},
-				{
-					label: 'Weapons',
-					description: 'The recommended weapons for the character.',
-					value: 'weapons',
-					emoji: '⚔️'
-				},
-				{
-					label: 'Artifacts',
-					description: 'The recommended artifacts for the character.',
-					value: 'artifacts',
-					emoji: '🎭'
-				},
-				{
-					label: 'Constellations',
-					description: 'The constellations of the character.',
-					value: 'constellations',
-					emoji: '🌠'
-				},
-				{
-					label: 'Ascension Materials',
-					description: 'The ascension materials of the character.',
-					value: 'ascension_materials',
-					emoji: '🔮'
-				},
-				{
-					label: 'Talent Materials',
-					description: 'The talent materials of the character.',
-					value: 'talent_materials',
-					emoji: '💎'
-				}
-			])
-		);
-		const m = <Message<true>>await interaction.editReply({ embeds: [embed1], components: [select] });
+		const select = new MessageSelectMenu().setCustomId(id).addOptions([
+			{
+				label: 'General Information',
+				description: 'The basic information of the character.',
+				value: 'info',
+				emoji: 'ℹ️'
+			},
+			{
+				label: 'Story',
+				description: 'The story / lore of the character.',
+				value: 'story',
+				emoji: '📖'
+			},
+			{
+				label: 'Talents',
+				description: 'The talents of the character.',
+				value: 'talents',
+				emoji: '🖌️'
+			},
+			{
+				label: 'Weapons',
+				description: 'The recommended weapons for the character.',
+				value: 'weapons',
+				emoji: '⚔️'
+			},
+			{
+				label: 'Artifacts',
+				description: 'The recommended artifacts for the character.',
+				value: 'artifacts',
+				emoji: '🎭'
+			},
+			{
+				label: 'Constellations',
+				description: 'The constellations of the character.',
+				value: 'constellations',
+				emoji: '🌠'
+			},
+			{
+				label: 'Ascension Materials',
+				description: 'The ascension materials of the character.',
+				value: 'ascension_materials',
+				emoji: '🔮'
+			},
+			{
+				label: 'Talent Materials',
+				description: 'The talent materials of the character.',
+				value: 'talent_materials',
+				emoji: '💎'
+			}
+		]);
+		const m = <Message<true>>await interaction.editReply({ embeds: [embed1], components: [new MessageActionRow().addComponents(select)] });
 		const collector = interaction.channel!.createMessageComponentCollector({
 			filter: (i) => i.isSelectMenu() && i.customId === id && i.user.id === interaction.user.id,
 			idle: 180000
@@ -178,7 +176,7 @@ export class Character extends SlashCommand {
 				await i.deferUpdate();
 			})
 			.on('end', async () => {
-				await m.edit({ components: [select.setDisabled()] });
+				await m.edit({ components: [new MessageActionRow().addComponents(select.setDisabled(true))] });
 			});
 	}
 }
