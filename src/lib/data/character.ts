@@ -78,7 +78,7 @@ export const characters: Characters = {
 	}
 };
 
-export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko'];
+export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou'];
 
 export const elementImages: ElementImages = {
 	Electro: 'https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png',
