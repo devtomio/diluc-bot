@@ -1,13 +1,15 @@
-import type { SlashCommandStore } from '#structures/SlashCommandStore';
+import type Redis from 'ioredis';
+import type { REST } from '@discordjs/rest';
 
-declare module '@sapphire/framework' {
-	interface StoreRegistryEntries {
-		slashCommands: SlashCommandStore;
+declare module '@sapphire/pieces' {
+	interface Container {
+		redis: Redis.Redis;
+		rest: REST;
 	}
 }
 
-declare namespace NodeJS {
-	interface ProcessEnv {
-		DISCORD_TOKEN: string;
+declare module '@sapphire/framework' {
+	interface ScheduledTasks {
+		remind: never;
 	}
 }

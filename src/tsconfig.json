@@ -3,14 +3,20 @@
 	"compilerOptions": {
 		"rootDir": "./",
 		"outDir": "../dist",
-		"baseUrl": "./",
-		"composite": true,
+		"baseUrl": ".",
 		"preserveConstEnums": true,
 		"useDefineForClassFields": false,
+		"preserveSymlinks": true,
+		"skipLibCheck": true,
+		"declaration": false,
+		"declarationMap": false,
 		"paths": {
 			"#root/*": ["*"],
-			"#structures/*": ["structures/*"],
-			"#data/*": ["data/*"]
+			"#structures/*": ["lib/structures/*"],
+			"#data/*": ["lib/data/*"],
+			"#types/*": ["lib/types/*"],
+			"#util/*": ["lib/util/*"],
+			"discord-api-types": ["../node_modules/discord-api-types"]
 		}
 	},
 	"include": ["."]

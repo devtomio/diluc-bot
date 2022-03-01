@@ -1,6 +1,6 @@
 import { Listener, ListenerOptions } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
-import { blue, gray, green, white, red } from 'colorette';
+import { blue, gray, green, white } from 'colorette';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
@@ -9,23 +9,9 @@ const { version } = require('../../package');
 
 @ApplyOptions<ListenerOptions>({ once: true })
 export class Ready extends Listener<'ready'> {
-	public async run() {
-		await this.createSlashCommands();
-
+	public run() {
 		this.printBanner();
 		this.printStoreDebugInformation();
-	}
-
-	private async createSlashCommands() {
-		const store = this.container.stores.get('slashCommands')!;
-
-		try {
-			console.log(blue('Started refreshing application (/) commands.'));
-			await store.registerCommands();
-			console.log(green('Successfully reloaded application (/) commands.'));
-		} catch (err: any) {
-			console.error(red(err));
-		}
 	}
 
 	private printBanner() {

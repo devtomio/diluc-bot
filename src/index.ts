@@ -1,17 +1,11 @@
+process.env.NODE_ENV ??= 'development';
+
 import '@sapphire/plugin-logger/register';
 import 'reflect-metadata';
-import { SapphireClient } from '@sapphire/framework';
-import { Intents, Options } from 'discord.js';
-import { SlashCommandStore } from '#structures/SlashCommandStore';
+import { DilucClient } from '#root/lib/structures/DilucClient';
+import { green } from 'colorette';
 
-const client = new SapphireClient({
-	defaultPrefix: null,
-	intents: [Intents.FLAGS.GUILDS],
-	makeCache: Options.cacheWithLimits({
-		MessageManager: 50
-	})
-});
-
-client.stores.register(new SlashCommandStore());
+const client = new DilucClient();
 
 await client.login();
+client.logger.info(`${green('WS')} - Successfully logged in.`);

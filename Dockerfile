@@ -1,14 +1,57 @@
-FROM node
+# ================ #
+#    Base Stage    #
+# ================ #
 
-WORKDIR /diluc-bot
-COPY ["package.json", "yarn.lock", ".yarnrc.yml", "tsconfig.base.json", "./"]
+FROM node:17-bullseye-slim as base
 
-ADD .yarn /diluc-bot/.yarn
-ADD scripts /diluc-bot/scripts
-ADD src /diluc-bot/src
+WORKDIR /usr/src/app
 
-RUN yarn && yarn build
+ENV HUSKY=0
+ENV CI=true
 
-COPY . .
+RUN apt-get update && \
+    apt-get upgrade -y --no-install-recommends && \
+    apt-get install -y --no-install-recommends build-essential python3 dumb-init && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* && \
+    apt-get autoremove
 
-CMD ["yarn", "start"]
+COPY --chown=node:node yarn.lock .
+COPY --chown=node:node package.json .
+COPY --chown=node:node .yarnrc.yml .
+COPY --chown=node:node .yarn/ .yarn/
+
+ENTRYPOINT ["dumb-init", "--"]
+
+# ================ #
+#   Builder Stage  #
+# ================ #
+
+FROM base as builder
+
+ENV NODE_ENV="development"
+
+COPY --chown=node:node tsconfig.base.json tsconfig.base.json
+COPY --chown=node:node tsup.config.ts .
+COPY --chown=node:node src/ src/
+
+RUN yarn install --immutable
+RUN yarn run build
+
+# ================ #
+#   Runner Stage   #
+# ================ #
+
+FROM base AS runner
+
+ENV NODE_ENV="production"
+ENV NODE_OPTIONS="--enable-source-maps"
+
+COPY --chown=node:node --from=builder /usr/src/app/dist dist
+
+RUN yarn workspaces focus --all --production
+RUN chown node:node /usr/src/app/
+
+USER node
+
+CMD [ "yarn", "run", "start" ]

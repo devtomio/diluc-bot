@@ -1,3 +1,10 @@
 {
-	"commit_message": "$1($2): $3+"
+	"commit_message": "$1($2): $3+",
+	"custom_tasks": [
+		{
+			"name": "fmt",
+			"execute": ["yarn fmt"]
+		}
+	],
+	"hooks": ["fmt"]
 }
