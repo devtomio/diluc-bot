@@ -1,5 +1,7 @@
 # diluc-bot
 
+[![Deploy on Railway](https://railway.app/button.svg)](https://railway.app/new/template?template=https%3A%2F%2Fgithub.com%2F1chiSensei%2Fdiluc-bot&plugins=redis&envs=DISCORD_TOKEN&DISCORD_TOKENDesc=your+discord+token&referralCode=tomio)
+
 A Genshin Impact focused discord bot.
 
 ## References
