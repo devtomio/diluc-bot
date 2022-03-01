@@ -75,10 +75,18 @@ export const characters: Characters = {
 
 			He loves sweets since they are scarce in military life, but he avoids onions because they are said to be toxic to him. He also enjoys climbing since it helps him grow strength and camaraderie, and he expresses a wish to climb Liyue's mountains if the opportunity arises.
 		`
+	},
+	'Yun Jin': {
+		color: '#373656',
+		story: stripIndents`
+			Yun Jin is a talented director, playwright, and vocalist who is well-known across Liyue for her plays, pursuing her passion and going to great efforts to guarantee that everyone who attends her performances is happy. While she seems sophisticated and graceful in formal settings, she is also known to be quite sociable in private. She gets her ideas for her plays from a number of places; she likes a broad variety of specialty beverages as one of her hobbies, and she can write a play on any of them if she wants to.
+
+			While she appreciates her passion, she also enjoys variety; while she gets along with the troupe on theater-related topics, she regularly fights with them on personal matters because she believes they are too conventional. She is particularly fond of rock 'n' roll, and no matter how busy she is, she visits Xinyan and watches her performances at least three times a week. Xinyan feels she comes to see her because the fine arts are "suffocating." She attempts to keep her visits to a minimum because her interest in non-traditional music would be frowned upon by her elders.
+		`
 	}
 };
 
-export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou'];
+export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin'];
 
 export const elementImages: ElementImages = {
 	Electro: 'https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png',
