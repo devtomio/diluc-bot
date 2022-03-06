@@ -20,6 +20,8 @@ export class SlashCommand extends Command {
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
 		await interaction.deferReply({ ephemeral: true });
 
+		if (interaction.user.id !== '566155739652030465') return interaction.editReply("You don't have permissions to use this command.");
+
 		const modal = new Modal({
 			customId: `modal-${interaction.id}`,
 			title: 'Code to Evaluate',
