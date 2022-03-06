@@ -2,6 +2,7 @@ import { Listener, Events } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { blue, gray, green, white } from 'colorette';
 import { createRequire } from 'module';
+import { Routes } from 'discord-api-types/v9';
 
 const require = createRequire(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/no-var-requires

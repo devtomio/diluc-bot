@@ -12,7 +12,9 @@ import { isNullish } from '@sapphire/utilities';
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
-		registry.registerChatInputCommand((builder) => builder.setName(this.name).setDescription(this.description).setDefaultPermission(false));
+		registry.registerChatInputCommand((builder) => builder.setName(this.name).setDescription(this.description).setDefaultPermission(true), {
+			idHints: ['950037783114817576']
+		});
 	}
 
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
