@@ -1,4 +1,4 @@
-import { Listener, ListenerOptions } from '@sapphire/framework';
+import { Listener, Events } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { blue, gray, green, white } from 'colorette';
 import { createRequire } from 'module';
@@ -7,8 +7,8 @@ const require = createRequire(import.meta.url);
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { version } = require('../../package');
 
-@ApplyOptions<ListenerOptions>({ once: true })
-export class Ready extends Listener<'ready'> {
+@ApplyOptions<Listener.Options>({ once: true, event: Events.ClientReady })
+export class ReadyListener extends Listener {
 	public run() {
 		this.printBanner();
 		this.printStoreDebugInformation();

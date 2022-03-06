@@ -1206,7 +1206,7 @@ __metadata:
     colorette: ^2.0.16
     common-tags: ^1.8.2
     discord-api-types: ^0.27.2
-    discord.js: ^13.6.0
+    discord.js: "monbrey/discord.js#modals"
     eslint: ^8.9.0
     eslint-config-prettier: ^8.4.0
     eslint-plugin-prettier: ^4.0.0
@@ -1238,6 +1238,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"discord-api-types@npm:^0.27.1":
+  version: 0.27.3
+  resolution: "discord-api-types@npm:0.27.3"
+  checksum: c22d87e787fae6cffd9d23972a3d196d4b43f2fb6deeed50181e7c9d4e823a4fd30a3e1d0e0b3b48a7c284ae2b39fbe960dee988375c7d4072df445f30ac440e
+  languageName: node
+  linkType: hard
+
 "discord-api-types@npm:^0.27.2":
   version: 0.27.2
   resolution: "discord-api-types@npm:0.27.2"
@@ -1245,20 +1252,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"discord.js@npm:^13.6.0":
+"discord.js@monbrey/discord.js#modals":
   version: 13.6.0
-  resolution: "discord.js@npm:13.6.0"
+  resolution: "discord.js@https://github.com/monbrey/discord.js.git#commit=55340655f247f48fb66dde1d53342bb3dfeb4a39"
   dependencies:
     "@discordjs/builders": ^0.11.0
     "@discordjs/collection": ^0.4.0
     "@sapphire/async-queue": ^1.1.9
     "@types/node-fetch": ^2.5.12
     "@types/ws": ^8.2.2
-    discord-api-types: ^0.26.0
+    discord-api-types: ^0.27.1
     form-data: ^4.0.0
     node-fetch: ^2.6.1
     ws: ^8.4.0
-  checksum: 59c1297fbebf9b25c90ea125808bc9177c134fd7c481f82ace636ab88cfdc90bc6ec777c844d375d26231fc1664a67e80a1aad2aed484b808e4cd7d55cc1d9e3
+  checksum: 39dbfe4a9f496e2bef4e77e88565117e105aa00aee79abf761dc8acd31aef9303b62253ead0b5ba1b6b78bfa74ae6426f18bbe42f4280d1d9df5e7b328399da2
   languageName: node
   linkType: hard
 
