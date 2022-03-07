@@ -67,6 +67,8 @@ export class SlashCommand extends Command {
 
 		submittedModal.deferReply({ ephemeral: true });
 
+		await submittedModal.editReply('Loading...');
+
 		const code = submittedModal.fields.getTextInputValue(`modal-${interaction.id}`);
 		const flags = submittedModal.fields.getTextInputValue(`flags-${interaction.id}`).split(', ');
 		const flagTime = flags.includes('no-timeout') ? 60_000 : Infinity;
@@ -104,7 +106,7 @@ export class SlashCommand extends Command {
 		if (success) {
 			const content = [`**Output**: ${codeBlock(language, result)}`, footer, time].filter(Boolean).join('\n');
 
-			return submittedModal.reply(content);
+			return submittedModal.editReply(content);
 		}
 
 		const output = codeBlock(language, result);
