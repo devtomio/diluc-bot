@@ -49,7 +49,7 @@ export class SlashCommand extends Command {
 							type: 'TEXT_INPUT',
 							style: 'SHORT',
 							label: 'Flags',
-							customId: `modal-flags-${interaction.id}`
+							customId: `flags-${interaction.id}`
 						}
 					]
 				}
@@ -63,7 +63,7 @@ export class SlashCommand extends Command {
 		submittedModal.deferReply({ ephemeral: true });
 
 		const code = submittedModal.fields.getTextInputValue(`modal-${interaction.id}`);
-		const flags = submittedModal.fields.getTextInputValue(`modal-flags-${interaction.id}`).split(', ');
+		const flags = submittedModal.fields.getTextInputValue(`flags-${interaction.id}`).split(', ');
 		const flagTime = flags.includes('no-timeout') ? 60_000 : Infinity;
 		const language = flags.includes('json') ? 'json' : 'js';
 		const { success, result, time, type } = await this.timedEval(interaction, code, flags, flagTime);
