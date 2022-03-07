@@ -10,7 +10,10 @@ import { DiscordSnowflake } from '@sapphire/snowflake';
 })
 export class SlashCommand extends Command {
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
-		const msg = await interaction.reply({ content: '🏓 Pinging...', ephemeral: true, fetchReply: true });
+		const msg = await interaction.deferReply({ ephemeral: true, fetchReply: true });
+
+		await interaction.editReply('🏓 Pinging...');
+
 		const timestamp = DiscordSnowflake.timestampFrom(msg.id);
 		const diff = timestamp - interaction.createdTimestamp;
 		const ping = Math.round(this.container.client.ws.ping);

@@ -194,7 +194,8 @@ export class SlashCommand extends Command {
 				body: result,
 				headers: {
 					'Content-Type': 'text/plain'
-				}
+				},
+				method: FetchMethods.Post
 			},
 			FetchResultTypes.JSON
 		);
