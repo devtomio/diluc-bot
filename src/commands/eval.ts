@@ -19,9 +19,8 @@ export class SlashCommand extends Command {
 	}
 
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
-		await interaction.deferReply({ ephemeral: true });
-
-		if (interaction.user.id !== '566155739652030465') return interaction.editReply("You don't have permissions to use this command.");
+		if (interaction.user.id !== '566155739652030465')
+			return interaction.reply({ content: "You don't have permissions to use this command.", ephemeral: true });
 
 		const modal = new Modal({
 			customId: `modal-${interaction.id}`,
@@ -41,9 +40,9 @@ export class SlashCommand extends Command {
 
 		const submittedModal = await useModal(interaction, modal);
 
-		if (isNullish(submittedModal)) return interaction.editReply('You took too long to submit.');
+		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
 		// eslint-disable-next-line no-eval
-		return submittedModal.reply(eval(submittedModal.fields.getTextInputValue(`modal-${interaction.id}`)));
+		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${interaction.id}`)), ephemeral: true });
 	}
 }
