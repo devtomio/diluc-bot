@@ -1,4 +1,4 @@
-import { Command, type ChatInputCommand } from '@sapphire/framework';
+import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { useModal } from '#util/useModal';
 import { Modal } from 'discord.js';
@@ -7,7 +7,8 @@ import { isNullish } from '@sapphire/utilities';
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'Evaluates arbitrary JavaScript code. (only for owners)',
 	chatInputCommand: {
-		register: true
+		register: true,
+		behaviorWhenNotIdentical: RegisterBehavior.Overwrite
 	}
 })
 export class SlashCommand extends Command {
