@@ -104,7 +104,7 @@ export class SlashCommand extends Command {
 		if (success) {
 			const content = [`**Output**: ${codeBlock(language, result)}`, footer, time].filter(Boolean).join('\n');
 
-			return submittedModal.editReply(content);
+			return submittedModal.reply(content);
 		}
 
 		const output = codeBlock(language, result);
