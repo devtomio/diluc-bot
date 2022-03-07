@@ -1,9 +1,17 @@
 import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { useModal } from '#util/useModal';
-import { Modal } from 'discord.js';
-import { isNullish } from '@sapphire/utilities';
-import { randomUUID } from 'crypto';
+import { CommandInteraction, Modal } from 'discord.js';
+import { isNullish, isThenable, codeBlock } from '@sapphire/utilities';
+import { randomUUID } from 'node:crypto';
+import { Stopwatch } from '@sapphire/stopwatch';
+import { Type } from '@sapphire/type';
+import { inspect } from 'node:util';
+import { clean } from '#util/clean';
+import { cast } from '#util/cast';
+import { setTimeout as sleep } from 'node:timers/promises';
+import { fetch, FetchMethods, FetchResultTypes } from '@sapphire/fetch';
+import { canSendAttachments } from '@sapphire/discord.js-utilities';
 
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'Evaluates arbitrary JavaScript code. (only for owners)',
@@ -36,6 +44,12 @@ export class SlashCommand extends Command {
 							style: 'PARAGRAPH',
 							label: 'Code to Evaluate',
 							customId: `modal-${interaction.id}`
+						},
+						{
+							type: 'TEXT_INPUT',
+							style: 'SHORT',
+							label: 'Flags',
+							customId: `modal-flags-${interaction.id}`
 						}
 					]
 				}
@@ -46,7 +60,140 @@ export class SlashCommand extends Command {
 
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
-		// eslint-disable-next-line no-eval
-		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${interaction.id}`)), ephemeral: true });
+		submittedModal.deferReply({ ephemeral: true });
+
+		const code = submittedModal.fields.getTextInputValue(`modal-${interaction.id}`);
+		const flags = submittedModal.fields.getTextInputValue(`modal-flags-${interaction.id}`).split(', ');
+		const flagTime = flags.includes('no-timeout') ? 60_000 : Infinity;
+		const language = flags.includes('json') ? 'json' : 'js';
+		const { success, result, time, type } = await this.timedEval(interaction, code, flags, flagTime);
+
+		if (flags.includes('silent')) {
+			if (!success && result && cast<Error>(result).stack) this.container.logger.fatal(cast<Error>(result).stack);
+			return submittedModal.editReply('Silent.');
+		}
+
+		const footer = codeBlock('ts', type);
+
+		if (flags.includes('file') && canSendAttachments(interaction.channel)) {
+			const content = [result, footer, time].filter(Boolean).join('\n');
+			const ext = '.txt';
+			const attachment = Buffer.from(content ?? result);
+			const name = `output${ext}`;
+
+			return submittedModal.editReply({ content: 'Sent the output as a file.', files: [{ attachment, name }] });
+		} else if (flags.includes('haste')) {
+			const url = await this.uploadHaste(result);
+			const content = [url, footer, time].filter(Boolean).join('\n');
+
+			return submittedModal.editReply(content);
+		}
+
+		if (result.length > 1950) {
+			const url = await this.uploadHaste(result);
+			const content = [url, footer, time].filter(Boolean).join('\n');
+
+			return submittedModal.editReply(content);
+		}
+
+		if (success) {
+			const content = [`**Output**: ${codeBlock(language, result)}`, footer, time].filter(Boolean).join('\n');
+
+			return submittedModal.editReply(content);
+		}
+
+		const output = codeBlock(language, result);
+		const content = `**Error**: ${output}\n**Type**: ${type}\n${time}`;
+
+		return submittedModal.editReply(content);
+	}
+
+	private async timedEval(interaction: CommandInteraction, code: string, flags: string[], flagTime: number) {
+		if (flagTime === Infinity || flagTime === 0) return this.eval(interaction, code, flags);
+
+		return Promise.race([
+			sleep(flagTime).then(() => ({
+				result: 'The result took too long.',
+				success: false,
+				time: '⏱ ...',
+				type: 'EvalTimeoutError'
+			})),
+			this.eval(interaction, code, flags)
+		]);
+	}
+
+	// @ts-expect-error For eval purposes
+	private async eval(interaction: CommandInteraction, code: string, flags: string[]) {
+		const stopwatch = new Stopwatch();
+		let success: boolean;
+		let syncTime = '';
+		let asyncTime = '';
+		let result: unknown;
+		let thenable = false;
+		let type: Type;
+
+		try {
+			if (flags.includes('async')) code = `(async () => {\n${code}\n})();`;
+
+			// eslint-disable-next-line no-eval
+			result = eval(code);
+			syncTime = stopwatch.toString();
+			type = new Type(result);
+
+			if (isThenable(result)) {
+				thenable = true;
+				stopwatch.restart();
+				result = await result;
+				asyncTime = stopwatch.toString();
+			}
+
+			success = true;
+		} catch (error) {
+			if (!syncTime.length) syncTime = stopwatch.toString();
+			if (thenable && !asyncTime.length) asyncTime = stopwatch.toString();
+			if (!type!) type = new Type(error);
+
+			result = error;
+			success = false;
+		}
+
+		stopwatch.stop();
+
+		if (typeof result !== 'string')
+			result =
+				result instanceof Error
+					? result.stack
+					: flags.includes('json')
+					? JSON.stringify(result, null, 4)
+					: inspect(result, {
+							depth: 0,
+							showHidden: flags.includes('hidden')
+					  });
+
+		return {
+			success,
+			type: type!,
+			time: this.formatTime(syncTime, asyncTime ?? ''),
+			result: clean(cast(result))
+		};
+	}
+
+	private formatTime(syncTime: string, asyncTime?: string) {
+		return asyncTime ? `⏱ ${asyncTime}<${syncTime}>` : `⏱ ${syncTime}`;
+	}
+
+	private async uploadHaste(result: string) {
+		const { key } = await fetch<{ key: string }>(
+			'https://www.toptal.com/developers/hastebin/documents',
+			{
+				body: result,
+				headers: {
+					'Content-Type': 'text/plain'
+				}
+			},
+			FetchResultTypes.JSON
+		);
+
+		return `https://www.toptal.com/developers/hastebin/${key}`;
 	}
 }
