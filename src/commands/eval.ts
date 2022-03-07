@@ -1,7 +1,7 @@
 import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { useModal } from '#util/useModal';
-import { CommandInteraction, Modal } from 'discord.js';
+import { CommandInteraction, Modal, type Message } from 'discord.js';
 import { isNullish, isThenable, codeBlock } from '@sapphire/utilities';
 import { randomUUID } from 'node:crypto';
 import { Stopwatch } from '@sapphire/stopwatch';
@@ -65,10 +65,7 @@ export class SlashCommand extends Command {
 
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
-		submittedModal.deferReply({ ephemeral: true });
-
-		await submittedModal.editReply('Loading...');
-
+		const msg = cast<Message>(await submittedModal.reply({ content: 'Loading...', fetchReply: true, ephemeral: true }));
 		const code = submittedModal.fields.getTextInputValue(`modal-${interaction.id}`);
 		const flags = submittedModal.fields.getTextInputValue(`flags-${interaction.id}`).split(', ');
 		const flagTime = flags.includes('no-timeout') ? 60_000 : Infinity;
@@ -77,7 +74,7 @@ export class SlashCommand extends Command {
 
 		if (flags.includes('silent')) {
 			if (!success && result && cast<Error>(result).stack) this.container.logger.fatal(cast<Error>(result).stack);
-			return submittedModal.editReply('Silent.');
+			return msg.edit('Silent.');
 		}
 
 		const footer = codeBlock('ts', type);
@@ -88,31 +85,31 @@ export class SlashCommand extends Command {
 			const attachment = Buffer.from(content ?? result);
 			const name = `output${ext}`;
 
-			return submittedModal.editReply({ content: 'Sent the output as a file.', files: [{ attachment, name }] });
+			return msg.edit({ content: 'Sent the output as a file.', files: [{ attachment, name }] });
 		} else if (flags.includes('haste')) {
 			const url = await this.uploadHaste(result);
 			const content = [url, footer, time].filter(Boolean).join('\n');
 
-			return submittedModal.editReply(content);
+			return msg.edit(content);
 		}
 
 		if (result.length > 1950) {
 			const url = await this.uploadHaste(result);
 			const content = [url, footer, time].filter(Boolean).join('\n');
 
-			return submittedModal.editReply(content);
+			return msg.edit(content);
 		}
 
 		if (success) {
 			const content = [`**Output**: ${codeBlock(language, result)}`, footer, time].filter(Boolean).join('\n');
 
-			return submittedModal.editReply(content);
+			return msg.edit(content);
 		}
 
 		const output = codeBlock(language, result);
 		const content = `**Error**: ${output}\n**Type**: ${type}\n${time}`;
 
-		return submittedModal.editReply(content);
+		return msg.edit(content);
 	}
 
 	private async timedEval(interaction: CommandInteraction, code: string, flags: string[], flagTime: number) {
