@@ -95,10 +95,24 @@ export const characters: Characters = {
 
 			He was distraught following his friend's death and refused to talk to any of his crewmates after joining the Crux, but he finally warmed up to them and is now pretty sociable, according to Beidou. Kazuha has a highly poetic side to him; he likes writing haikus in his leisure time and is readily inspired, despite the fact that he professes to be not particularly great at it. Kazuha has grown particularly fond of easily accessible grilled fish as a result of both touring many locations and sailing for extended periods of time, and he takes the time to prepare and consume his dinner carefully. While he is not particular about what he eats, he dislikes hurried meals and sloppy cooking methods. His most valued item is his sword, which he always carries with him and is a source of pride for Kazuha as both an Inazuman and a samurai. He also like red maple leaves, which he finds stunning and enjoys watching rain throughout the fall season. When he is unable to see such sites, he regularly collects and takes them as a souvenir to alleviate any homesickness.
 		`
+	},
+	Lisa: {
+		color: '#3f308e',
+		story: stripIndents`
+			Lisa is a skilled witch, and as such, she is fascinated with the elements and the artifacts that might help her comprehend them. Despite her position as Librarian, Lisa appears to approach it fairly casually, since she looks to be bored with common books and prefers those in the restricted area. She still takes the work seriously, and will go out of her way to collect overdue books, although in a way that allows her to appreciate the little pleasures in life.
+
+			Her haphazard, careless nature stems from her Vision, for while the gods provided it to her and she was satiated with everything she desired to acquire, they did not tell her the cost, and she grew to fear the reality behind them. This made her suspicious, and she left Sumeru out of worry that she was paying too much for knowledge, relegating herself to classification and library administration, typically refusing to take on any additional work until absolutely necessary.
+
+			When Lisa gets enraged, the air around her becomes electrified, thanks in part to her Electro Vision. Depending on the degree of what has enraged her, she can be annoyed or incredibly frightening, with the latter motivating her to provide "proper" punishment.
+
+			Lisa appears to be fond of the Traveler and occasionally behaves flirty, as she frequently refers to them as "cutie" or "darling," and she acknowledges they are precious to her.
+
+			She adores tea and considers afternoon tea to be the most essential part of her day. She occasionally drinks tea with vegetable soup, like she used to do with Jean at the Good Hunter restaurant. She also has cucurbitophobia, or a fear of pumpkins.
+		`
 	}
 };
 
-export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin', 'Kaedehara Kazuha'];
+export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin', 'Kaedehara Kazuha', 'Lisa'];
 
 export const elementImages: ElementImages = {
 	Electro: 'https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png',
