@@ -7,14 +7,14 @@ import { isNullish } from '@sapphire/utilities';
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'Evaluates arbitrary JavaScript code. (only for owners)',
 	chatInputCommand: {
-		register: true,
-		behaviorWhenNotIdentical: RegisterBehavior.Overwrite
+		register: true
 	}
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
 		registry.registerChatInputCommand((builder) => builder.setName(this.name).setDescription(this.description).setDefaultPermission(true), {
-			idHints: ['950037783114817576']
+			idHints: ['950037783114817576'],
+			behaviorWhenNotIdentical: RegisterBehavior.Overwrite
 		});
 	}
 
