@@ -48,6 +48,6 @@ export class SlashCommand extends Command {
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
 		// eslint-disable-next-line no-eval
-		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${componentId}`)), ephemeral: true });
+		return submittedModal.reply({ content: eval(submittedModal.fields.getField(`modal-${componentId}`).value), ephemeral: true });
 	}
 }
