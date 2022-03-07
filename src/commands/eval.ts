@@ -24,7 +24,6 @@ export class SlashCommand extends Command {
 			return interaction.reply({ content: "You don't have permissions to use this command.", ephemeral: true });
 
 		const modalId = randomUUID();
-		const componentId = randomUUID();
 		const modal = new Modal({
 			customId: `modal-${modalId}`,
 			title: 'Eval Command',
@@ -36,7 +35,7 @@ export class SlashCommand extends Command {
 							type: 'TEXT_INPUT',
 							style: 'PARAGRAPH',
 							label: 'Code to Evaluate',
-							customId: `modal-${componentId}`
+							customId: `modal-${interaction.id}`
 						}
 					]
 				}
@@ -48,6 +47,6 @@ export class SlashCommand extends Command {
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
 		// eslint-disable-next-line no-eval
-		return submittedModal.reply({ content: eval(submittedModal.fields.getField(`modal-${componentId}`).value), ephemeral: true });
+		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${interaction.id}`)), ephemeral: true });
 	}
 }
