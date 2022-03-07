@@ -65,7 +65,7 @@ export class SlashCommand extends Command {
 
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
-		const msg = cast<Message>(await submittedModal.reply({ content: 'Loading...', fetchReply: true, ephemeral: true }));
+		const msg = cast<Message>(await submittedModal.reply({ content: 'Loading...', fetchReply: true }));
 		const code = submittedModal.fields.getTextInputValue(`modal-${interaction.id}`);
 		const flags = submittedModal.fields.getTextInputValue(`flags-${interaction.id}`).split(', ');
 		const flagTime = flags.includes('no-timeout') ? 60_000 : Infinity;
