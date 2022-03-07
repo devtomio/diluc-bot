@@ -3,6 +3,7 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { useModal } from '#util/useModal';
 import { Modal } from 'discord.js';
 import { isNullish } from '@sapphire/utilities';
+import { randomUUID } from 'crypto';
 
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'Evaluates arbitrary JavaScript code. (only for owners)',
@@ -22,27 +23,31 @@ export class SlashCommand extends Command {
 		if (interaction.user.id !== '566155739652030465')
 			return interaction.reply({ content: "You don't have permissions to use this command.", ephemeral: true });
 
+		const modalId = randomUUID();
+		const componentId = randomUUID();
 		const modal = new Modal({
-			customId: `modal-${interaction.id}`,
-			title: 'Code to Evaluate',
+			customId: `modal-${modalId}`,
+			title: 'Eval Command',
 			components: [
 				{
 					type: 'ACTION_ROW',
 					components: [
 						{
 							type: 'TEXT_INPUT',
-							style: 'PARAGRAPH'
+							style: 'PARAGRAPH',
+							label: 'Code to Evaluate',
+							customId: `modal-${componentId}`
 						}
 					]
 				}
 			]
 		});
 
-		const submittedModal = await useModal(interaction, modal);
+		const submittedModal = await useModal(interaction, modal, modalId);
 
 		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
 
 		// eslint-disable-next-line no-eval
-		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${interaction.id}`)), ephemeral: true });
+		return submittedModal.reply({ content: eval(submittedModal.fields.getTextInputValue(`modal-${componentId}`)), ephemeral: true });
 	}
 }
