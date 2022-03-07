@@ -83,10 +83,22 @@ export const characters: Characters = {
 
 			While she appreciates her passion, she also enjoys variety; while she gets along with the troupe on theater-related topics, she regularly fights with them on personal matters because she believes they are too conventional. She is particularly fond of rock 'n' roll, and no matter how busy she is, she visits Xinyan and watches her performances at least three times a week. Xinyan feels she comes to see her because the fine arts are "suffocating." She attempts to keep her visits to a minimum because her interest in non-traditional music would be frowned upon by her elders.
 		`
+	},
+	'Kaedehara Kazuha': {
+		color: '#eee0d7',
+		story: stripIndents`
+			Kazuha is a courteous and well-spoken person. In comparison to other noble Inazuman clan members, Kazuha loves to travel rather than stay indoors, which the seizure of his clan house allowed him to do owing to a lack of riches and obligation. For the most of his life, he wandered Inazuma quietly as a simple wanderer, training himself bladework and picking up other abilities but never chasing luxury. Instead, he is readily delighted simply by lying on a sun-warmed rock. He becomes sensitive to nature and the wind as a result of his time spent outside, allowing him to "hear" and "smell" everything around him with absolute clarity. He can detect threats, read individuals, and hunt them down in a second, regardless of how well they attempt to hide it. Because of this sensitivity, he enjoys calm weather and never remains in one location for too long, since the former causes him to have difficulty sleeping while the latter causes his talents to stagnate.
+
+			Kazuha is steadfast in his pursuit of his goals, pursuing them with thoroughness and guile, yet he also takes his time and is laid-back. He is quite contemplative and attentive about everything, and he constantly ponders many themes during his trips. He values his friendships, coming out of hiding for his pal and being eternally thankful to Beidou and Gorou for taking him in when he needed refuge. Kazuha constantly warns others of impending storms and potential disaster, and he gladly runs basic errands, provides advice, and is eager to assist others.
+
+			In keeping with his Anemo connection, Kazuha fervently believes in the notion of freedom — that everyone is entitled to their ambitions and dreams and that no one, not even a deity, has the right to take them away. As a result, he is opposed to the Raiden Shogun and all who support her. Despite his principles, he isn't arrogant and can recognize the bravery and noble behavior of others with whom he disagrees. He regards his friend's duel as valiant and noble, but also believes that the Shogun's subsequent death was both fair and justifiable.
+
+			He was distraught following his friend's death and refused to talk to any of his crewmates after joining the Crux, but he finally warmed up to them and is now pretty sociable, according to Beidou. Kazuha has a highly poetic side to him; he likes writing haikus in his leisure time and is readily inspired, despite the fact that he professes to be not particularly great at it. Kazuha has grown particularly fond of easily accessible grilled fish as a result of both touring many locations and sailing for extended periods of time, and he takes the time to prepare and consume his dinner carefully. While he is not particular about what he eats, he dislikes hurried meals and sloppy cooking methods. His most valued item is his sword, which he always carries with him and is a source of pride for Kazuha as both an Inazuman and a samurai. He also like red maple leaves, which he finds stunning and enjoys watching rain throughout the fall season. When he is unable to see such sites, he regularly collects and takes them as a souvenir to alleviate any homesickness.
+		`
 	}
 };
 
-export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin'];
+export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin', 'Kaedehara Kazuha'];
 
 export const elementImages: ElementImages = {
 	Electro: 'https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png',

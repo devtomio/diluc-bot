@@ -77,7 +77,7 @@ export class SlashCommand extends Command {
 			return msg.edit('Silent.');
 		}
 
-		const footer = codeBlock('ts', type);
+		const footer = `**Type**:\n${codeBlock('ts', type)}`;
 
 		if (flags.includes('file') && canSendAttachments(interaction.channel)) {
 			const content = [result, footer, time].filter(Boolean).join('\n');
@@ -88,7 +88,7 @@ export class SlashCommand extends Command {
 			return msg.edit({ content: 'Sent the output as a file.', files: [{ attachment, name }] });
 		} else if (flags.includes('haste')) {
 			const url = await this.uploadHaste(result);
-			const content = [url, footer, time].filter(Boolean).join('\n');
+			const content = [`<${url}>`, footer, time].filter(Boolean).join('\n');
 
 			return msg.edit(content);
 		}
