@@ -109,10 +109,22 @@ export const characters: Characters = {
 
 			She adores tea and considers afternoon tea to be the most essential part of her day. She occasionally drinks tea with vegetable soup, like she used to do with Jean at the Good Hunter restaurant. She also has cucurbitophobia, or a fear of pumpkins.
 		`
+	},
+	Sayu: {
+		color: '#f2ddb2',
+		story: stripIndents`
+			Sayu is a ninja who appears to be perpetually sleep-deprived and utilizes her abilities to avoid work and obligations. She is profoundly dissatisfied with her height and believes that sleeping will refill all of her energy and enable her grow taller. She developed her ninjutsu to perfection in order to live by this philosophy and have as much time to snooze as possible.
+
+			While she is well-known for her apparent lethargy, the members of the Shuumatsuban know that she is committed to their mission since she would never go against their ideals or slack off on vitally critical topics. Ayaka feels Sayu's sloth stems from her sensei's unexpected departure, since she looked up to him and got lost and bewildered when he went.
+
+			Of all, from Sayu's perspective, this so-called "laziness" is just superior time management that allows her to focus on things... such as sleeping and becoming taller She dislikes it when others stroke her head, claiming that it hinders her development. She tolerates headpats from both the Traveler and Yae Miko, albeit the latter is afraid of the Guuji's response.
+
+			Sayu, although being a very skilled ninja, is generally in charge of reconnaissance and other random chores. While she has been trained in battle, the techniques she has learnt are mostly for stealth and evasion. She enjoys the Traveler's company and is eager to work more for their sake. Sayu grows enraged anytime others refer to her as a tanuki when dressed as a mujina, which she thinks are exceedingly charming, and even attacks them.
+		`
 	}
 };
 
-export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin', 'Kaedehara Kazuha', 'Lisa'];
+export const list = ['Diluc', 'Sangonomiya Kokomi', 'Ganyu', 'Raiden Shogun', 'Yae Miko', 'Gorou', 'Yun Jin', 'Kaedehara Kazuha', 'Lisa', 'Sayu'];
 
 export const elementImages: ElementImages = {
 	Electro: 'https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png',
