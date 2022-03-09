@@ -20,7 +20,9 @@ export class SlashCommand extends Command {
 						cmd
 							.setName('show')
 							.setDescription('Shows the content of a tag.')
-							.addStringOption((option) => option.setName('name').setDescription('The name of the tag').setRequired(true))
+							.addStringOption((option) =>
+								option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true)
+							)
 					)
 					.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.')),
 			{ idHints: ['951001361267458058'] }
