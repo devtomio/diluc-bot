@@ -1,6 +1,6 @@
 import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
-import { Modal, type CommandInteraction, type Message } from 'discord.js';
+import { Modal, Permissions, type CommandInteraction, type Message, type GuildMember } from 'discord.js';
 import { useModal } from '#util/useModal';
 import { randomUUID } from 'node:crypto';
 import { isNullish } from '@sapphire/utilities';
@@ -24,7 +24,17 @@ export class SlashCommand extends Command {
 								option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true)
 							)
 					)
-					.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.')),
+					.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.'))
+					.addSubcommand((cmd) =>
+						cmd
+							.setName('delete')
+							.setDescription(
+								"Deletes a tag. (A tag may only be deleted by the tag's creator or a member with the Moderate Members permission."
+							)
+							.addStringOption((option) =>
+								option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true)
+							)
+					),
 			{ idHints: ['951001361267458058'], behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
@@ -36,6 +46,7 @@ export class SlashCommand extends Command {
 
 		if (subCommand === 'show') return this.show(interaction);
 		else if (subCommand === 'create') return this.create(interaction);
+		else if (subCommand === 'delete') return this.delete(interaction);
 	}
 
 	private async show(interaction: CommandInteraction) {
@@ -93,22 +104,42 @@ export class SlashCommand extends Command {
 
 		if (exists) return msg.edit(`The tag "${name}" already exists in this guild.`);
 
-		await this.container.redis.hset(
-			`tags:${name}:${interaction.guildId}`,
-			'name',
-			name,
-			'content',
-			content,
-			'guildId',
-			interaction.guildId!,
-			'ownerId',
-			interaction.user.id,
-			'ownerName',
-			interaction.user.username
-		);
-
-		await this.container.redis.lpush(`tags:${interaction.guildId}`, name);
+		await this.container.redis
+			.multi()
+			.hset(
+				`tags:${name}:${interaction.guildId}`,
+				'name',
+				name,
+				'content',
+				content,
+				'guildId',
+				interaction.guildId!,
+				'ownerId',
+				interaction.user.id,
+				'ownerName',
+				interaction.user.username
+			)
+			.lpush(`tags:${interaction.guildId}`, name)
+			.exec();
 
 		return msg.edit(`The tag "${name}" was created successfully!`);
+	}
+
+	private async delete(interaction: CommandInteraction) {
+		await interaction.deferReply();
+
+		const name = interaction.options.getString('name', true);
+		const ownerId = await this.container.redis.hget(`tags:${name}:${interaction.guildId}`, 'ownerId');
+
+		if (!ownerId) return interaction.editReply("Sorry, that tag doesn't exist.");
+
+		const owner = await interaction.guild!.members.fetch(ownerId);
+
+		if (owner.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
+			return interaction.editReply("You don't have permissions to edit this tag.");
+
+		await this.container.redis.del(`tags:${name}:${interaction.guildId}`);
+
+		return interaction.editReply(`The tag "${name}" was deleted successfully!`);
 	}
 }

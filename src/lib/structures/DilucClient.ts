@@ -35,7 +35,7 @@ export class DilucClient extends SapphireClient {
 			}
 		});
 
-		container.redis = new Redis(process.env.REDIS_URL);
+		container.redis = new Redis(process.env.REDIS_URL, { enableAutoPipelining: true });
 		container.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN!);
 	}
 }

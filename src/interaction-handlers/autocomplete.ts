@@ -24,10 +24,13 @@ export class AutocompleteHandler extends InteractionHandler {
 			const arr = matched.map((mt) => mt.item);
 
 			return this.some(arr.map((item) => ({ name: item, value: item })));
-		} else if (interaction.commandName === 'tag' && interaction.options.getSubcommand(true) === 'show') {
+		} else if (
+			interaction.commandName === 'tag' &&
+			(interaction.options.getSubcommand(true) === 'show' || interaction.options.getSubcommand(true) === 'delete')
+		) {
 			const focused = interaction.options.getFocused(true);
 
-			if (typeof focused.value !== 'string' || focused.value === '') return this.none();
+			if (typeof focused.value !== 'string' || focused.value === '') return this.some([]);
 
 			const matched = await this.container.redis.fuzzySearch(`tags:${interaction.guildId}`, focused.value);
 			const processed = cast<{ haystack: string; match: number }[]>(JSON.parse(matched));
