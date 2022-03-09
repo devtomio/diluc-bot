@@ -7,11 +7,7 @@ import { isNullish } from '@sapphire/utilities';
 import { cast } from '#util/cast';
 
 @ApplyOptions<ChatInputCommand.Options>({
-	description: 'A tag command where you can make notes.',
-	chatInputCommand: {
-		register: true,
-		behaviorWhenNotIdentical: RegisterBehavior.Overwrite
-	}
+	description: 'A tag command where you can make notes.'
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
@@ -29,7 +25,7 @@ export class SlashCommand extends Command {
 							)
 					)
 					.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.')),
-			{ idHints: ['951001361267458058'] }
+			{ idHints: ['951001361267458058'], behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
 
