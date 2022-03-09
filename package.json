@@ -10,7 +10,12 @@
 		"build": "tsup",
 		"fmt": "prettier . --write",
 		"lint": "eslint src --ext ts --fix",
-		"watch": "tsup --watch"
+		"watch": "tsup --watch",
+		"db:pull": "prisma db pull",
+		"db:push": "prisma db push",
+		"db:generate": "prisma generate",
+		"db:studio": "prisma studio",
+		"db:fmt": "prisma format"
 	},
 	"repository": {
 		"type": "git",
@@ -32,6 +37,7 @@
 	"dependencies": {
 		"@discordjs/rest": "^0.3.0",
 		"@naval-base/ms": "^3.1.0",
+		"@prisma/client": "^3.10.0",
 		"@sapphire/decorators": "^4.2.5",
 		"@sapphire/discord.js-utilities": "^4.8.1",
 		"@sapphire/fetch": "^2.1.0",
@@ -72,6 +78,7 @@
 		"husky": "^7.0.4",
 		"is-ci": "^3.0.1",
 		"prettier": "^2.5.1",
+		"prisma": "^3.10.0",
 		"tsup": "^5.11.13",
 		"typescript": "^4.5.5"
 	}

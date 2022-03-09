@@ -1,12 +1,9 @@
 import { Listener, Events } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { blue, gray, green, white } from 'colorette';
-import { createRequire } from 'module';
-import { Routes } from 'discord-api-types/v9';
 
-const require = createRequire(import.meta.url);
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { version } = require('../../package');
+// @ts-ignore What you'd expect
+import { version } from '../../package.json' assert { type: 'json' };
 
 @ApplyOptions<Listener.Options>({ once: true, event: Events.ClientReady })
 export class ReadyListener extends Listener {

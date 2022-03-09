@@ -1,10 +1,12 @@
 import type Redis from 'ioredis';
 import type { REST } from '@discordjs/rest';
+import type { PrismaClient } from '@prisma/client';
 
 declare module '@sapphire/pieces' {
 	interface Container {
 		redis: Redis.Redis;
 		rest: REST;
+		db: PrismaClient;
 	}
 }
 
