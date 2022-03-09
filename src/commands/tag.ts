@@ -40,7 +40,10 @@ export class SlashCommand extends Command {
 		const name = interaction.options.getString('name', true);
 		const data = await this.container.db.tag.findUnique({
 			where: {
-				id: `${name}-${interaction.guildId}`
+				name_guildID: {
+					name,
+					guildID: interaction.guildId!
+				}
 			}
 		});
 
@@ -91,7 +94,10 @@ export class SlashCommand extends Command {
 		const content = submittedModal.fields.getTextInputValue(`content-${interaction.id}`);
 		const exists = await this.container.db.tag.findUnique({
 			where: {
-				id: `${name}-${interaction.guildId}`
+				name_guildID: {
+					name,
+					guildID: interaction.guildId!
+				}
 			}
 		});
 
@@ -101,7 +107,6 @@ export class SlashCommand extends Command {
 			data: {
 				name,
 				content,
-				id: `${name}-${interaction.guildId}`,
 				guildID: interaction.guildId!,
 				ownerID: interaction.user.id,
 				ownerName: interaction.user.username
