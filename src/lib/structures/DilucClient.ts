@@ -4,7 +4,7 @@ import { Options } from 'discord.js';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
 import { GatewayIntentBits } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '#structures/Prisma';
 
 export class DilucClient extends SapphireClient {
 	public constructor() {
