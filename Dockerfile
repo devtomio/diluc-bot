@@ -28,7 +28,7 @@ ENV NODE_ENV="development"
 COPY tsconfig.base.json tsconfig.base.json
 COPY tsup.config.ts .
 COPY src/ src/
-COPY prisma/ prisma/
+COPY redis/ redis/
 
 RUN yarn install --immutable
 RUN yarn run build
