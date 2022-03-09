@@ -28,6 +28,8 @@ export class SlashCommand extends Command {
 	}
 
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
+		if (isNullish(interaction.guildId)) return interaction.reply({ content: 'You can only use this command inside of guilds.', ephemeral: true });
+
 		const subCommand = interaction.options.getSubcommand(true);
 
 		if (subCommand === 'show') return this.show(interaction);
@@ -38,18 +40,11 @@ export class SlashCommand extends Command {
 		await interaction.deferReply();
 
 		const name = interaction.options.getString('name', true);
-		const data = await this.container.db.tag.findUnique({
-			where: {
-				name_guildID: {
-					name,
-					guildID: interaction.guildId!
-				}
-			}
-		});
+		const content = await this.container.redis.hget(`tags:${name}:${interaction.guildId}`, 'content');
 
-		if (!data) return interaction.editReply("Sorry, that tag doesn't exist.");
+		if (!content) return interaction.editReply("Sorry, that tag doesn't exist.");
 
-		return interaction.editReply({ content: data.content, allowedMentions: { parse: [] } });
+		return interaction.editReply({ content, allowedMentions: { parse: [] } });
 	}
 
 	private async create(interaction: CommandInteraction) {
@@ -92,26 +87,25 @@ export class SlashCommand extends Command {
 		const msg = cast<Message>(await submittedModal.reply({ content: 'Creating your tag...', fetchReply: true }));
 		const name = submittedModal.fields.getTextInputValue(`name-${interaction.id}`);
 		const content = submittedModal.fields.getTextInputValue(`content-${interaction.id}`);
-		const exists = await this.container.db.tag.findUnique({
-			where: {
-				name_guildID: {
-					name,
-					guildID: interaction.guildId!
-				}
-			}
-		});
+		const exists = await this.container.redis.hexists(`tags:${name}:${interaction.guildId}`, 'name');
 
 		if (exists) return msg.edit(`The tag "${name}" already exists in this guild.`);
 
-		await this.container.db.tag.create({
-			data: {
-				name,
-				content,
-				guildID: interaction.guildId!,
-				ownerID: interaction.user.id,
-				ownerName: interaction.user.username
-			}
-		});
+		await this.container.redis.hset(
+			`tags:${name}:${interaction.guildId}`,
+			'name',
+			name,
+			'content',
+			content,
+			'guildId',
+			interaction.guildId!,
+			'ownerId',
+			interaction.user.id,
+			'ownerName',
+			interaction.user.username
+		);
+
+		await this.container.redis.lpush(`tags:${interaction.guildId}`, name);
 
 		return msg.edit(`The tag "${name}" was created successfully!`);
 	}

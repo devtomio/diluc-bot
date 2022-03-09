@@ -12,17 +12,28 @@ export class AutocompleteHandler extends InteractionHandler {
 		return interaction.respond(result);
 	}
 
-	public override parse(interaction: AutocompleteInteraction) {
-		if (interaction.commandName !== 'character') return this.none();
+	public override async parse(interaction: AutocompleteInteraction) {
+		if (interaction.commandName === 'character') {
+			const focused = interaction.options.getFocused(true);
+			const fuse = new Fuse(list);
 
-		const focused = interaction.options.getFocused(true);
-		const fuse = new Fuse(list);
+			if (typeof focused.value !== 'string' || focused.value === '') return this.some(list.map((item) => ({ name: item, value: item })));
 
-		if (typeof focused.value !== 'string' || focused.value === '') return this.some(list.map((item) => ({ name: item, value: item })));
+			const matched = fuse.search(focused.value);
+			const arr = matched.map((mt) => mt.item);
 
-		const matched = fuse.search(focused.value);
-		const arr = matched.map((mt) => mt.item);
+			return this.some(arr.map((item) => ({ name: item, value: item })));
+		} else if (interaction.commandName === 'tag' && interaction.options.getSubcommand(true) === 'show') {
+			const focused = interaction.options.getFocused(true);
 
-		return this.some(arr.map((item) => ({ name: item, value: item })));
+			if (typeof focused.value !== 'string' || focused.value === '') return this.none();
+
+			const matched = await this.container.redis.fuzzySearch(`tags:${interaction.guildId}`, focused.value);
+			const arr = matched.map((mt) => mt.haystack);
+
+			return this.some(arr.map((item) => ({ name: item, value: item })));
+		}
+
+		return this.none();
 	}
 }

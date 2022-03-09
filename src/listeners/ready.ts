@@ -1,6 +1,7 @@
 import { Listener, Events } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { blue, gray, green, white } from 'colorette';
+import { readFile } from 'node:fs/promises';
 
 @ApplyOptions<Listener.Options>({ once: true, event: Events.ClientReady })
 export class ReadyListener extends Listener {
@@ -8,7 +9,8 @@ export class ReadyListener extends Listener {
 		// @ts-ignore As you'd expect
 		const { version } = (await import('../../package.json', { assert: { type: 'json' } })).default;
 
-		await this.printBanner(version);
+		await this.setRedisCommands();
+		this.printBanner(version);
 		this.printStoreDebugInformation();
 	}
 
@@ -43,5 +45,14 @@ ${line05}
 
 	private styleStore(store: any, last: boolean) {
 		return gray(`${last ? '└─' : '├─'} Loaded ${blue(store.size.toString().padEnd(3, ' '))} ${store.name}.`);
+	}
+
+	private async setRedisCommands() {
+		const script = await readFile('./scripts/fuzzySearch.lua', { encoding: 'utf-8' });
+
+		this.container.redis.defineCommand('fuzzySearch', {
+			numberOfKeys: 1,
+			lua: script
+		});
 	}
 }

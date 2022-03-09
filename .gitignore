@@ -27,3 +27,4 @@ gh
 wiki/
 .env
 .swc/
+test/

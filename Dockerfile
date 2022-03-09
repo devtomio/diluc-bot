@@ -17,7 +17,7 @@ COPY yarn.lock .
 COPY package.json .
 COPY .yarnrc.yml .
 COPY .yarn/ .yarn/
-COPY prisma/ prisma/
+COPY redis/ redis/
 
 ENTRYPOINT ["dumb-init", "--"]
 
@@ -32,7 +32,6 @@ COPY prisma/ prisma/
 
 RUN yarn install --immutable
 RUN yarn run build
-RUN yarn run db:generate
 
 FROM base as runner
 

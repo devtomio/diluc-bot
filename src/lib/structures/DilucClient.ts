@@ -4,7 +4,6 @@ import { Options } from 'discord.js';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
 import { GatewayIntentBits } from 'discord-api-types/v9';
 import { REST } from '@discordjs/rest';
-import { PrismaClient } from '#structures/Prisma';
 
 export class DilucClient extends SapphireClient {
 	public constructor() {
@@ -38,6 +37,5 @@ export class DilucClient extends SapphireClient {
 
 		container.redis = new Redis(process.env.REDIS_URL);
 		container.rest = new REST({ version: '9' }).setToken(process.env.DISCORD_TOKEN!);
-		container.db = new PrismaClient();
 	}
 }
