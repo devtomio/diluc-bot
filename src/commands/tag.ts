@@ -11,23 +11,23 @@ import { cast } from '#util/cast';
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
-		registry.registerChatInputCommand((builder) =>
-			builder
-				.setName(this.name)
-				.setDescription(this.description)
-				.addSubcommand((cmd) =>
-					cmd
-						.setName('show')
-						.setDescription('Shows the content of a tag.')
-						.addStringOption((option) => option.setName('name').setDescription('The name of the tag').setRequired(true))
-				)
-				.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.'))
+		registry.registerChatInputCommand(
+			(builder) =>
+				builder
+					.setName(this.name)
+					.setDescription(this.description)
+					.addSubcommand((cmd) =>
+						cmd
+							.setName('show')
+							.setDescription('Shows the content of a tag.')
+							.addStringOption((option) => option.setName('name').setDescription('The name of the tag').setRequired(true))
+					)
+					.addSubcommand((cmd) => cmd.setName('create').setDescription('Creates a new tag.')),
+			{ idHints: ['951001361267458058'] }
 		);
 	}
 
 	public override async chatInputRun(...[interaction]: Parameters<ChatInputCommand['chatInputRun']>) {
-		await interaction.deferReply();
-
 		const subCommand = interaction.options.getSubcommand(true);
 
 		if (subCommand === 'show') return this.show(interaction);
@@ -35,6 +35,8 @@ export class SlashCommand extends Command {
 	}
 
 	private async show(interaction: CommandInteraction) {
+		await interaction.deferReply();
+
 		const name = interaction.options.getString('name', true);
 		const data = await this.container.db.tag.findUnique({
 			where: {
