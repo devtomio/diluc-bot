@@ -1,15 +1,16 @@
-import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
+import { RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Modal, Permissions, type CommandInteraction, type Message, type GuildMember } from 'discord.js';
 import { useModal } from '#util/useModal';
 import { randomUUID } from 'node:crypto';
 import { isNullish } from '@sapphire/utilities';
 import { cast } from '#util/cast';
+import { DilucCommand } from '#structures/DilucCommand';
 
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'A tag command where you can make notes.'
 })
-export class SlashCommand extends Command {
+export class SlashCommand extends DilucCommand {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
 		registry.registerChatInputCommand(
 			(builder) =>
@@ -34,7 +35,8 @@ export class SlashCommand extends Command {
 							.addStringOption((option) =>
 								option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true)
 							)
-					),
+					)
+					.addSubcommand((cmd) => cmd.setName('edit').setDescription('Edits an existing tag.')),
 			{ idHints: ['951001361267458058'], behaviorWhenNotIdentical: RegisterBehavior.Overwrite }
 		);
 	}
@@ -47,6 +49,7 @@ export class SlashCommand extends Command {
 		if (subCommand === 'show') return this.show(interaction);
 		else if (subCommand === 'create') return this.create(interaction);
 		else if (subCommand === 'delete') return this.delete(interaction);
+		else if (subCommand === 'edit') return this.edit(interaction);
 	}
 
 	private async show(interaction: CommandInteraction) {
@@ -141,5 +144,64 @@ export class SlashCommand extends Command {
 		await this.container.redis.del(`tags:${name}:${interaction.guildId}`);
 
 		return interaction.editReply(`The tag "${name}" was deleted successfully!`);
+	}
+
+	private async edit(interaction: CommandInteraction) {
+		const modalId = randomUUID();
+		const modal = new Modal({
+			customId: `modal-${modalId}`,
+			title: 'Edit a Tag',
+			components: [
+				{
+					type: 'ACTION_ROW',
+					components: [
+						{
+							type: 'TEXT_INPUT',
+							style: 'SHORT',
+							label: 'New Name',
+							placeholder: 'awesome_tag',
+							customId: `name-${interaction.id}`
+						}
+					]
+				},
+				{
+					type: 'ACTION_ROW',
+					components: [
+						{
+							type: 'TEXT_INPUT',
+							style: 'PARAGRAPH',
+							label: 'New Content',
+							placeholder: 'Hello world!',
+							customId: `content-${interaction.id}`
+						}
+					]
+				}
+			]
+		});
+
+		const submittedModal = await useModal(interaction, modal, modalId);
+
+		if (isNullish(submittedModal)) return interaction.reply({ content: 'You took too long to submit.', ephemeral: true });
+
+		const msg = cast<Message>(await submittedModal.reply({ content: 'Creating your tag...', fetchReply: true }));
+		const name = submittedModal.fields.getTextInputValue(`name-${interaction.id}`);
+		const content = submittedModal.fields.getTextInputValue(`content-${interaction.id}`);
+		const ownerId = await this.container.redis.hget(`tags:${name}:${interaction.guildId}`, 'ownerId');
+
+		if (!ownerId) return interaction.editReply("Sorry, that tag doesn't exist.");
+
+		const owner = await interaction.guild!.members.fetch(ownerId);
+
+		if (owner.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
+			return interaction.editReply("You don't have permissions to edit this tag.");
+
+		await this.container.redis
+			.multi()
+			.hset(`tags:${name}:${interaction.guildId}`, 'name', name, 'content', content)
+			.lrem(`tags:${interaction.guildId}`, 1, name)
+			.lpush(`tags:${interaction.guildId}`, name)
+			.exec();
+
+		return msg.edit(`The tag "${name}" was edited successfully!`);
 	}
 }
