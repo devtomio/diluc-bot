@@ -1,10 +1,8 @@
-# ================ #
-#    Base Stage    #
-# ================ #
-
 FROM node:17-bullseye-slim as base
 
-WORKDIR /usr/src/app
+WORKDIR /app
+USER container
+ARG DATABASE_URL
 
 ENV HUSKY=0
 ENV CI=true
@@ -16,43 +14,34 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove
 
-COPY --chown=node:node yarn.lock .
-COPY --chown=node:node package.json .
-COPY --chown=node:node .yarnrc.yml .
-COPY --chown=node:node .yarn/ .yarn/
+COPY yarn.lock .
+COPY package.json .
+COPY yarnrc.yml .
+COPY .yarn/ .yarn/
+COPY prisma/ prisma/
 
 ENTRYPOINT ["dumb-init", "--"]
-
-# ================ #
-#   Builder Stage  #
-# ================ #
 
 FROM base as builder
 
 ENV NODE_ENV="development"
 
-COPY --chown=node:node tsconfig.base.json tsconfig.base.json
-COPY --chown=node:node tsup.config.ts .
-COPY --chown=node:node src/ src/
-COPY --chown=node:node prisma/ prisma/
+COPY tsconfig.base.json tsconfig.base.json
+COPY tsup.config.ts .
+COPY src/ src/
+COPY prisma/ prisma/
 
 RUN yarn install --immutable
 RUN yarn run build
+RUN yarn run db:generate
 
-# ================ #
-#   Runner Stage   #
-# ================ #
-
-FROM base AS runner
+FROM base as runner
 
 ENV NODE_OPTIONS="--enable-source-maps"
 
-COPY --chown=node:node --from=builder /usr/src/app/dist dist
-COPY --chown=node:node --from=builder /usr/src/app/prisma prisma
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/prisma ./prisma
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
 
-RUN yarn workspaces focus --all
-RUN chown -R node:node /usr/src/app/
-
-USER node
-
-CMD [ "yarn", "run", "start" ]
+CMD ["yarn", "run", "start"]

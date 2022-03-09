@@ -6,7 +6,7 @@
 	"type": "module",
 	"scripts": {
 		"test": "eslint .",
-		"start": "yarn db:generate && node --preserve-symlinks --enable-source-maps dist/index.js",
+		"start": "node --preserve-symlinks --enable-source-maps dist/index.js",
 		"build": "tsup",
 		"fmt": "prettier . --write",
 		"lint": "eslint src --ext ts --fix",
