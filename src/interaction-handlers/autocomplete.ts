@@ -3,6 +3,7 @@ import type { AutocompleteInteraction } from 'discord.js';
 import { ApplyOptions } from '@sapphire/decorators';
 import { list } from '#data/character';
 import Fuse from 'fuse.js';
+import { cast } from '#util/cast';
 
 @ApplyOptions<InteractionHandler.Options>({
 	interactionHandlerType: InteractionHandlerTypes.Autocomplete
@@ -29,7 +30,8 @@ export class AutocompleteHandler extends InteractionHandler {
 			if (typeof focused.value !== 'string' || focused.value === '') return this.none();
 
 			const matched = await this.container.redis.fuzzySearch(`tags:${interaction.guildId}`, focused.value);
-			const arr = matched.map((mt) => mt.haystack);
+			const processed = cast<{ haystack: string; match: number }[]>(JSON.parse(matched));
+			const arr = processed.map((mt) => mt.haystack);
 
 			return this.some(arr.map((item) => ({ name: item, value: item })));
 		}
