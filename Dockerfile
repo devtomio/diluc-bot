@@ -48,6 +48,7 @@ FROM base AS runner
 ENV NODE_OPTIONS="--enable-source-maps"
 
 COPY --chown=node:node --from=builder /usr/src/app/dist dist
+COPY --chown=node:node --from=builder /usr/src/app/prisma prisma
 
 RUN yarn workspaces focus --all
 RUN chown node:node /usr/src/app/
