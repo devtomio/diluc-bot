@@ -6,8 +6,6 @@ FROM node:17-bullseye-slim as base
 
 WORKDIR /usr/src/app
 
-ARG DATABASE_URL
-
 ENV HUSKY=0
 ENV CI=true
 
@@ -40,7 +38,6 @@ COPY --chown=node:node prisma/ prisma/
 
 RUN yarn install --immutable
 RUN yarn run build
-RUN yarn run db:generate
 
 # ================ #
 #   Runner Stage   #
