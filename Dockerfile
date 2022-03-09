@@ -1,7 +1,6 @@
 FROM node:17-bullseye-slim as base
 
 WORKDIR /app
-USER container
 ARG DATABASE_URL
 
 ENV HUSKY=0
