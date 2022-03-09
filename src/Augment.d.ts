@@ -16,6 +16,6 @@ declare module '@sapphire/framework' {
 
 declare module 'ioredis' {
 	interface Redis {
-		fuzzySearch: (name: string, search: string) => Array<{ haystack: string; match: number }>;
+		fuzzySearch: (name: string, search: string) => Promise<Array<{ haystack: string; match: number }>>;
 	}
 }
