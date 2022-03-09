@@ -2,17 +2,17 @@ import { Listener, Events } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { blue, gray, green, white } from 'colorette';
 
-// @ts-ignore What you'd expect
-import { version } from '../../package.json' assert { type: 'json' };
-
 @ApplyOptions<Listener.Options>({ once: true, event: Events.ClientReady })
 export class ReadyListener extends Listener {
-	public run() {
-		this.printBanner();
+	public async run() {
+		// @ts-ignore As you'd expect
+		const { version } = (await import('../../package.json', { assert: { type: 'json' } })).default;
+
+		await this.printBanner(version);
 		this.printStoreDebugInformation();
 	}
 
-	private printBanner() {
+	private printBanner(version: string) {
 		const success = green('+');
 		const line01 = white(' ____  _ _            ');
 		const line02 = white('|  _ \\(_) |_   _  ___ ');
