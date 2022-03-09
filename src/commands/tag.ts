@@ -1,4 +1,4 @@
-import { Command, type ChatInputCommand } from '@sapphire/framework';
+import { Command, RegisterBehavior, type ChatInputCommand } from '@sapphire/framework';
 import { ApplyOptions } from '@sapphire/decorators';
 import { Modal, type CommandInteraction, type Message } from 'discord.js';
 import { useModal } from '#util/useModal';
@@ -7,7 +7,11 @@ import { isNullish } from '@sapphire/utilities';
 import { cast } from '#util/cast';
 
 @ApplyOptions<ChatInputCommand.Options>({
-	description: 'A tag command where you can make notes.'
+	description: 'A tag command where you can make notes.',
+	chatInputCommand: {
+		register: true,
+		behaviorWhenNotIdentical: RegisterBehavior.Overwrite
+	}
 })
 export class SlashCommand extends Command {
 	public override registerApplicationCommands(...[registry]: Parameters<ChatInputCommand['registerApplicationCommands']>) {
