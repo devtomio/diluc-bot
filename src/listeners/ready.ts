@@ -48,7 +48,9 @@ ${line05}
 	}
 
 	private async setRedisCommands() {
-		const script = await readFile('./scripts/fuzzySearch.lua', { encoding: 'utf-8' });
+		const rootFolder = new URL('../../', import.meta.url);
+		const scriptPath = new URL('redis/fuzzySearch.lua', rootFolder);
+		const script = await readFile(scriptPath, { encoding: 'utf-8' });
 
 		this.container.redis.defineCommand('fuzzySearch', {
 			numberOfKeys: 1,
