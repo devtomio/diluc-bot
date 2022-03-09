@@ -49,7 +49,7 @@ ENV NODE_OPTIONS="--enable-source-maps"
 
 COPY --chown=node:node --from=builder /usr/src/app/dist dist
 
-RUN yarn workspaces focus --all --production
+RUN yarn workspaces focus --all
 RUN chown node:node /usr/src/app/
 
 USER node
