@@ -52,7 +52,7 @@ COPY --chown=node:node --from=builder /usr/src/app/prisma prisma
 
 RUN yarn workspaces focus --all
 RUN chown node:node /usr/src/app/
-RUN chown node:node /usr/src/app/prisma
+RUN chown node:node /usr/src/app/node_modules/.prisma
 
 USER node
 
