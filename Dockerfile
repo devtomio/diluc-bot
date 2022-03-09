@@ -15,7 +15,7 @@ RUN apt-get update && \
 
 COPY yarn.lock .
 COPY package.json .
-COPY yarnrc.yml .
+COPY .yarnrc.yml .
 COPY .yarn/ .yarn/
 COPY prisma/ prisma/
 
