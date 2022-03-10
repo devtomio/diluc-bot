@@ -4,7 +4,6 @@ import { ApplyOptions } from '@sapphire/decorators';
 import { list } from '#data/character';
 import Fuse from 'fuse.js';
 import { cast } from '#util/cast';
-import { isNullish } from '@sapphire/utilities';
 
 @ApplyOptions<InteractionHandler.Options>({
 	interactionHandlerType: InteractionHandlerTypes.Autocomplete
@@ -34,9 +33,10 @@ export class AutocompleteHandler extends InteractionHandler {
 			if (typeof focused.value !== 'string' || focused.value === '') return this.some([]);
 
 			const matched = await this.container.redis.fuzzySearch(`tags:${interaction.guildId}`, focused.value);
-			const processed = cast<{ haystack: string; match: number }[] | null>(JSON.parse(matched));
+			const processed = cast<{ haystack: string; match: number }[] | Record<string, never>>(JSON.parse(matched));
 
-			if (isNullish(processed)) return this.some([]);
+			// eslint-disable-next-line no-implicit-coercion
+			if (!!processed && processed.constructor === Object && Object.keys(processed).length === 0) return this.some([]);
 
 			const arr = processed.map((mt) => mt.haystack);
 
