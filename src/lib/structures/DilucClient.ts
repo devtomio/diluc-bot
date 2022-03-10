@@ -1,4 +1,4 @@
-import { SapphireClient, container } from '@sapphire/framework';
+import { SapphireClient, container, LogLevel } from '@sapphire/framework';
 import Redis from 'ioredis';
 import { Options } from 'discord.js';
 import { ScheduledTaskRedisStrategy } from '@sapphire/plugin-scheduled-tasks/register-redis';
@@ -14,6 +14,9 @@ export class DilucClient extends SapphireClient {
 			makeCache: Options.cacheWithLimits({
 				MessageManager: 50
 			}),
+			logger: {
+				level: LogLevel.Debug
+			},
 			sweepers: {
 				...Options.defaultSweeperSettings,
 				messages: {
