@@ -26,7 +26,10 @@ export class AutocompleteHandler extends InteractionHandler {
 			return this.some(arr.map((item) => ({ name: item, value: item })));
 		} else if (
 			interaction.commandName === 'tag' &&
-			(interaction.options.getSubcommand(true) === 'show' || interaction.options.getSubcommand(true) === 'delete')
+			(interaction.options.getSubcommand(true) === 'show' ||
+				interaction.options.getSubcommand(true) === 'delete' ||
+				interaction.options.getSubcommand(true) === 'edit' ||
+				interaction.options.getSubcommand(true) === 'info')
 		) {
 			const focused = interaction.options.getFocused(true);
 
