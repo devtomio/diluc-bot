@@ -29,9 +29,7 @@ export class SlashCommand extends DilucCommand {
 					.addSubcommand((cmd) =>
 						cmd
 							.setName('delete')
-							.setDescription(
-								"Deletes a tag. (A tag may only be deleted by the tag's creator or a member with the Moderate Members permission."
-							)
+							.setDescription("Deletes a tag. (A tag may only be deleted by the tag's creator or by a moderator.)")
 							.addStringOption((option) =>
 								option.setName('name').setDescription('The name of the tag').setRequired(true).setAutocomplete(true)
 							)
