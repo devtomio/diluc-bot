@@ -18,6 +18,7 @@ COPY package.json .
 COPY .yarnrc.yml .
 COPY .yarn/ .yarn/
 COPY redis/ redis/
+COPY scripts/ scripts/
 
 ENTRYPOINT ["dumb-init", "--"]
 
@@ -29,13 +30,16 @@ COPY tsconfig.base.json tsconfig.base.json
 COPY tsup.config.ts .
 COPY src/ src/
 COPY redis/ redis/
+COPY scripts/ scripts/
 
 RUN yarn install --immutable
 RUN yarn run build
 
 FROM base as runner
 
-ENV NODE_OPTIONS="--enable-source-maps"
+COPY --from=builder /app/scripts ./scripts
+
+ENV NODE_OPTIONS="--enable-source-maps --require=./scripts/suppressExperimental.cjs"
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/redis ./redis
