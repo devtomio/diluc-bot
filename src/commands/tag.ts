@@ -93,7 +93,8 @@ export class SlashCommand extends DilucCommand {
 							style: 'SHORT',
 							label: 'Name',
 							placeholder: 'awesome_tag',
-							customId: `name-${interaction.id}`
+							customId: `name-${interaction.id}`,
+							required: true
 						}
 					]
 				},
@@ -105,7 +106,8 @@ export class SlashCommand extends DilucCommand {
 							style: 'PARAGRAPH',
 							label: 'Content',
 							placeholder: 'Hello world!',
-							customId: `content-${interaction.id}`
+							customId: `content-${interaction.id}`,
+							required: true
 						}
 					]
 				}
@@ -154,9 +156,7 @@ export class SlashCommand extends DilucCommand {
 
 		if (!ownerId) return interaction.editReply("Sorry, that tag doesn't exist.");
 
-		const owner = await interaction.guild!.members.fetch(ownerId);
-
-		if (owner.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
+		if (interaction.user.id !== ownerId || !cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
 			return interaction.editReply("You don't have permissions to edit this tag.");
 
 		await this.container.redis.del(`tags:${name}:${interaction.guildId}`);
@@ -179,7 +179,8 @@ export class SlashCommand extends DilucCommand {
 							style: 'PARAGRAPH',
 							label: 'New Content',
 							placeholder: 'Hello world!',
-							customId: `content-${interaction.id}`
+							customId: `content-${interaction.id}`,
+							required: true
 						}
 					]
 				}
@@ -196,7 +197,7 @@ export class SlashCommand extends DilucCommand {
 
 		if (isNullish(ownerId)) return msg.edit("Sorry, that tag doesn't exist.");
 
-		if (interaction.user.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
+		if (interaction.user.id !== ownerId || !cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
 			return msg.edit("You don't have permissions to edit this tag.");
 
 		await this.container.redis

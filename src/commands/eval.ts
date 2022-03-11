@@ -43,7 +43,8 @@ export class SlashCommand extends Command {
 							type: 'TEXT_INPUT',
 							style: 'PARAGRAPH',
 							label: 'Code to Evaluate',
-							customId: `modal-${interaction.id}`
+							customId: `modal-${interaction.id}`,
+							required: true
 						}
 					]
 				},
