@@ -136,7 +136,7 @@ export class SlashCommand extends DilucCommand {
 				'ownerId',
 				interaction.user.id,
 				'ownerTag',
-				`${interaction.user.username}#${interaction.user.tag}`,
+				interaction.user.tag,
 				'createdAt',
 				Date.now()
 			)
@@ -194,12 +194,14 @@ export class SlashCommand extends DilucCommand {
 		const content = submittedModal.fields.getTextInputValue(`content-${interaction.id}`);
 		const ownerId = await this.container.redis.hget(`tags:${name}:${interaction.guildId}`, 'ownerId');
 
-		if (!ownerId) return interaction.editReply("Sorry, that tag doesn't exist.");
+		console.log(msg);
+
+		if (!ownerId) return interaction.reply("Sorry, that tag doesn't exist.");
 
 		const owner = await interaction.guild!.members.fetch(ownerId);
 
 		if (owner.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
-			return interaction.editReply("You don't have permissions to edit this tag.");
+			return interaction.reply("You don't have permissions to edit this tag.");
 
 		await this.container.redis
 			.multi()
