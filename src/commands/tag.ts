@@ -196,9 +196,7 @@ export class SlashCommand extends DilucCommand {
 
 		if (isNullish(ownerId)) return msg.edit("Sorry, that tag doesn't exist.");
 
-		const owner = await interaction.guild!.members.fetch(ownerId);
-
-		if (owner.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
+		if (interaction.user.id !== ownerId || cast<GuildMember>(interaction.member).permissions.has(Permissions.FLAGS.MODERATE_MEMBERS))
 			return msg.edit("You don't have permissions to edit this tag.");
 
 		await this.container.redis
