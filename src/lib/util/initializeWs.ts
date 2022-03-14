@@ -48,7 +48,5 @@ export const initializeWs = async () => {
 		res.end(stats);
 	});
 
-	app.any('/*', (res) => res.end('WS Connections only'));
-
 	app.listen(Number(process.env.PORT), () => container.logger.info(`${blue('WS')} - Initialized WebSocket server.`));
 };
