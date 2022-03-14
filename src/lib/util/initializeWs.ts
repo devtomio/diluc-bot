@@ -32,6 +32,8 @@ export const initializeWs = async () => {
 
 	app.get('/', (res) => res.end('hello world'));
 	app.get('/stats', async (res) => {
+		res.onAborted(() => (res.aborted = true));
+
 		const mem = process.memoryUsage();
 		const info = await container.redis.info();
 		const dbEntries = await container.redis.dbsize();
@@ -45,8 +47,10 @@ export const initializeWs = async () => {
 			dbEntries
 		});
 
-		res.writeHeader('Content-Type', 'application/json');
-		res.end(stats);
+		if (!res.aborted) {
+			res.writeHeader('Content-Type', 'application/json');
+			res.end(stats);
+		}
 	});
 
 	app.listen(Number(process.env.PORT), () => container.logger.info(`${blue('WS')} - Initialized WebSocket server.`));
