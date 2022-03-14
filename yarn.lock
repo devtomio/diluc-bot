@@ -634,6 +634,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/redis-info@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "@types/redis-info@npm:3.0.0"
+  checksum: 93a09193f9beb07e941617f7e1b4ebf50d454e71f58823a455685a94c0e773c8e0d53850c495b86dfe401ae792326c5df47670798f9ad1504850150d0237e851
+  languageName: node
+  linkType: hard
+
 "@types/redis@npm:^2.8.0":
   version: 2.8.32
   resolution: "@types/redis@npm:2.8.32"
@@ -1193,6 +1200,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"dayjs@npm:^1.10.8":
+  version: 1.10.8
+  resolution: "dayjs@npm:1.10.8"
+  checksum: 5a6b358a0646a780b7dbbec07b8c4400425143f88bf127f456bd2e75a854046f54808d65da2bf964c8267b82dbde0530e990376757ce7d961349d9cde8716a1d
+  languageName: node
+  linkType: hard
+
 "debug@npm:4, debug@npm:^4.1.0, debug@npm:^4.3.1":
   version: 4.3.3
   resolution: "debug@npm:4.3.3"
@@ -1292,12 +1306,14 @@ __metadata:
     "@types/common-tags": ^1.8.1
     "@types/ioredis": ^4.28.8
     "@types/node": ^17.0.18
+    "@types/redis-info": ^3.0.0
     "@typescript-eslint/eslint-plugin": ^5.14.0
     "@yukikaze-bot/erlpack": ^1.0.1
     bufferutil: ^4.0.6
     bull: ^4.7.0
     colorette: ^2.0.16
     common-tags: ^1.8.2
+    dayjs: ^1.10.8
     discord-api-types: ^0.28.0
     discord.js: "monbrey/discord.js#modals"
     eslint: ^8.10.0
@@ -1309,9 +1325,11 @@ __metadata:
     ioredis: ^4.28.5
     is-ci: ^3.0.1
     prettier: ^2.5.1
+    redis-info: ^3.1.0
     reflect-metadata: ^0.1.13
     tsup: ^5.12.0
     typescript: ^4.6.2
+    uWebSockets.js: "uNetworking/uWebSockets.js#v20.6.0"
     utf-8-validate: ^5.0.9
     zlib-sync: ^0.1.7
   languageName: unknown
@@ -2465,7 +2483,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:^4.17.21":
+"lodash@npm:^4.17.11, lodash@npm:^4.17.21":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -3075,6 +3093,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"redis-info@npm:^3.1.0":
+  version: 3.1.0
+  resolution: "redis-info@npm:3.1.0"
+  dependencies:
+    lodash: ^4.17.11
+  checksum: d72ff0584ebb4a2149cfcfcf9142d9a7f9d0b96ae53fbf431f2738f33f1f42add6505ff73b2d640cab345923a34b217d7c728fa706cc81ad8bd8ad4c48987445
+  languageName: node
+  linkType: hard
+
 "redis-parser@npm:^3.0.0":
   version: 3.0.0
   resolution: "redis-parser@npm:3.0.0"
@@ -3524,6 +3551,13 @@ __metadata:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 40b493a71747fb89fa70df104e2c4a5e284b43750af5bea024090a5261cefa387f7a9372411b13030f7bf5555cee4275443d08805642ae5c74ef76740854a4c7
+  languageName: node
+  linkType: hard
+
+"uWebSockets.js@uNetworking/uWebSockets.js#v20.6.0":
+  version: 20.6.0
+  resolution: "uWebSockets.js@https://github.com/uNetworking/uWebSockets.js.git#commit=a58e810e47a23696410f6073c8c905dc38f75da5"
+  checksum: 2004ae53952385f2da11ae43b0b638141b6fae7f5a9281bc92b58fb8b540b8246f16322e28f2cadf2bcae6deccec06c997a75c68a94c5cc5471dacae75b3f342
   languageName: node
   linkType: hard
 
