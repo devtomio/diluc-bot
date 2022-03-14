@@ -30,6 +30,7 @@ export const initializeWs = async () => {
 		}
 	});
 
+	app.get('/', (res) => res.end('hello world'));
 	app.get('/stats', async (res) => {
 		const mem = process.memoryUsage();
 		const info = await container.redis.info();
