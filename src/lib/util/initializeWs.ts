@@ -53,5 +53,5 @@ export const initializeWs = async () => {
 		}
 	});
 
-	app.listen(Number(process.env.PORT), () => container.logger.info(`${blue('WS')} - Initialized WebSocket server.`));
+	app.listen(3000, () => container.logger.info(`${blue('WS')} - Initialized WebSocket server.`));
 };
