@@ -33,6 +33,15 @@ export const initializeWs = async () => {
 	});
 
 	app.get('/', (res) => res.end('hello world'));
+	app.get('/healthcheck', (res) => {
+		if (!container.client || !container.redis || !container.rest) {
+			res.writeStatus('503 Service Unavailable');
+			res.end('come back later');
+		}
+
+		res.end('app online');
+	});
+
 	app.get('/stats', async (res) => {
 		res.onAborted(() => (res.aborted = true));
 
