@@ -10,7 +10,8 @@
 		"build": "tsup",
 		"fmt": "prettier . --write",
 		"lint": "eslint src --ext ts --fix",
-		"watch": "tsup --watch"
+		"watch": "tsup --watch",
+		"typecheck": "tsc -b src"
 	},
 	"repository": {
 		"type": "git",
