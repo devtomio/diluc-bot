@@ -26,14 +26,14 @@ interface CachedData {
 }
 
 const PageLabels = [
-	'General Information',
-	'Story / Lore',
-	'Talents',
-	'Artifacts',
-	'Weapons',
-	'Constellations',
-	'Ascension Materials',
-	'Talent Materials'
+	'ℹ️ - General Information',
+	'🧠 - Personality',
+	'👊 - Talents',
+	'👑 - Artifacts',
+	'🤺 - Weapons',
+	'🌟 - Constellations',
+	'💸 - Ascension Materials',
+	'💰 - Talent Materials'
 ];
 
 @ApplyOptions<ChatInputCommand.Options>({
@@ -62,7 +62,7 @@ export class SlashCommand extends DilucCommand {
 		}
 
 		const { character, constellations, talent, artifacts, weapons, statsPriority, subStatsPriority, talentPriority } = await this.getCached(name);
-		const { story, color } = otherInfo[name];
+		const { personality, color } = otherInfo[name];
 		const page = new PaginatedMessage({
 			pageIndexPrefix: `${character.constellation} |${PaginatedMessage.pageIndexPrefix}`,
 			template: new MessageEmbed()
@@ -73,6 +73,7 @@ export class SlashCommand extends DilucCommand {
 			.setSelectMenuOptions((pageIndex) => ({ label: PageLabels[pageIndex - 1] }))
 			.addPageEmbed((embed) =>
 				embed
+					.setTitle('ℹ️ - General Information')
 					.setDescription(character.description)
 					.addField('Gender', character.gender, true)
 					.addField('Birthday', character.birthday, true)
@@ -81,7 +82,7 @@ export class SlashCommand extends DilucCommand {
 					.addField('Affiliation', character.affiliation, true)
 					.addField('Title', character.title, true)
 			)
-			.addPageEmbed((embed) => embed.setDescription(story))
+			.addPageEmbed((embed) => embed.setTitle(`🧠 - Personality`).setDescription(personality))
 			.addPageEmbed((embed) => {
 				let talentText = stripIndents`
 					*Priority: ${talentPriority.join(' → ')}*
@@ -105,7 +106,7 @@ export class SlashCommand extends DilucCommand {
 				if (typeof talent.passive3 !== 'undefined') talentText += `\n\n***${talent.passive3.name}***\n${talent.passive3.info}`;
 				if (typeof talent.passive4 !== 'undefined') talentText += `\n\n***${talent.passive4.name}***\n${talent.passive4.info}`;
 
-				return embed.setDescription(talentText);
+				return embed.setTitle('👊 - Talents').setDescription(talentText);
 			})
 			.addPageEmbed((embed) => {
 				const artifactText = stripIndents`
@@ -123,9 +124,9 @@ export class SlashCommand extends DilucCommand {
 					${artifacts.map((artifact) => `__${artifact}__`).join('\n')}
 				`;
 
-				return embed.setDescription(artifactText);
+				return embed.setTitle('👑 - Artifacts').setDescription(artifactText);
 			})
-			.addPageEmbed((embed) => embed.setDescription(weapons.join('\n')))
+			.addPageEmbed((embed) => embed.setTitle('🤺 - Weapons').setDescription(weapons.join('\n')))
 			.addPageEmbed((embed) => {
 				const consText = stripIndents`
 					**${constellations.c1.name} (C1)**
@@ -147,7 +148,7 @@ export class SlashCommand extends DilucCommand {
 					${constellations.c6.effect}
 				`;
 
-				return embed.setDescription(consText);
+				return embed.setTitle('🌟 - Constellations').setDescription(consText);
 			})
 			.addPageEmbed((embed) => {
 				const fmt = new Intl.NumberFormat();
@@ -160,7 +161,7 @@ export class SlashCommand extends DilucCommand {
 					**Ascension Level 6:** ${character.costs.ascend6.map((item) => `${fmt.format(item.count)} ${item.name}`).join(', ')}
 				`;
 
-				return embed.setDescription(ascText);
+				return embed.setTitle('💸 - Ascension Materials').setDescription(ascText);
 			})
 			.addPageEmbed((embed) => {
 				const fmt = new Intl.NumberFormat();
@@ -176,7 +177,7 @@ export class SlashCommand extends DilucCommand {
 					**Talent Level 10:** ${talent.costs.lvl10.map((item) => `${fmt.format(item.count)} ${item.name}`).join(', ')}
 				`;
 
-				return embed.setDescription(talentText);
+				return embed.setTitle('💰 - Talent Materials').setDescription(talentText);
 			});
 
 		return page.run(interaction);
