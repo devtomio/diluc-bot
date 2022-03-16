@@ -12,7 +12,7 @@ on:
 
 jobs:
   PublishDragonite:
-    name: Publish dragonite image to container registries
+    name: Publish diluc-bot image to container registries
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Project
@@ -31,7 +31,7 @@ jobs:
           push: true
           context: ./
           file: Dockerfile
-          tags: ghcr.io/favware/dragonite:latest
+          tags: ghcr.io/devtomio/diluc-bot:latest
 
   DeployBot:
     name: Deploy the bot to Railway
