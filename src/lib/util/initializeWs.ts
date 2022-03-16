@@ -1,6 +1,6 @@
 import uWebSockets from 'uWebSockets.js';
 import { setTimeout } from 'timers/promises';
-import { container } from '@sapphire/framework';
+import { container, version as sapphireVersion } from '@sapphire/framework';
 import { blue } from 'colorette';
 import dayjs from 'dayjs';
 import { parse } from 'redis-info';
@@ -39,7 +39,6 @@ export const initializeWs = async () => {
 		const mem = process.memoryUsage();
 		const cpu = await sys.cpu();
 		const os = await sys.osInfo();
-		const docker = await sys.dockerInfo();
 		const info = await container.redis.info();
 		const dbEntries = await container.redis.dbsize();
 		const { redis_version } = parse(info);
@@ -52,10 +51,10 @@ export const initializeWs = async () => {
 			nodeVersion: process.version,
 			cpu: `${cpu.manufacturer} ${cpu.brand}`,
 			os: `${os.distro} (${os.release})`,
-			docker: docker.serverVersion,
 			cpuSpeed: `${cpu.speed} GHz`,
 			dbEntries,
-			discordJsVersion
+			discordJsVersion,
+			sapphireVersion
 		});
 
 		if (!res.aborted) {
