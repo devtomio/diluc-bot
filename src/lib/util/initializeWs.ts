@@ -4,6 +4,8 @@ import { container } from '@sapphire/framework';
 import { blue } from 'colorette';
 import dayjs from 'dayjs';
 import { parse } from 'redis-info';
+import { version as discordJsVersion } from 'discord.js';
+import sys from 'systeminformation';
 
 export const initializeWs = async () => {
 	await setTimeout(5000);
@@ -34,7 +36,10 @@ export const initializeWs = async () => {
 	app.get('/stats', async (res) => {
 		res.onAborted(() => (res.aborted = true));
 
-		const mem = process.memoryUsage();
+		const mem = await sys.mem();
+		const cpu = await sys.cpu();
+		const os = await sys.osInfo();
+		const docker = await sys.dockerInfo();
 		const info = await container.redis.info();
 		const dbEntries = await container.redis.dbsize();
 		const { redis_version } = parse(info);
@@ -42,9 +47,15 @@ export const initializeWs = async () => {
 			ping: container.client.ws.ping,
 			users: container.client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount ?? 0), 0),
 			servers: container.client.guilds.cache.size,
-			ram: `${Math.round((mem.heapUsed / 1024 / 1024) * 100) / 100} MB`,
+			ram: `${Math.round((mem.used / 1024 / 1024) * 100) / 100} MB`,
 			redisVersion: redis_version,
-			dbEntries
+			nodeVersion: process.version,
+			cpu: `${cpu.manufacturer} ${cpu.brand}`,
+			os: `${os.distro} (${os.release})`,
+			docker: docker.serverVersion,
+			cpuSpeed: `${cpu.speed} GHz`,
+			dbEntries,
+			discordJsVersion
 		});
 
 		if (!res.aborted) {

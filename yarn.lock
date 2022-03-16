@@ -1444,6 +1444,7 @@ __metadata:
     prettier: ^2.5.1
     redis-info: ^3.1.0
     reflect-metadata: ^0.1.13
+    systeminformation: ^5.11.8
     tsup: ^5.12.1
     typescript: ^4.6.2
     uWebSockets.js: "uNetworking/uWebSockets.js#v20.6.0"
@@ -3537,6 +3538,16 @@ __metadata:
   dependencies:
     has-flag: ^4.0.0
   checksum: 3dda818de06ebbe5b9653e07842d9479f3555ebc77e9a0280caf5a14fb877ffee9ed57007c3b78f5a6324b8dbeec648d9e97a24e2ed9fdb81ddc69ea07100f4a
+  languageName: node
+  linkType: hard
+
+"systeminformation@npm:^5.11.8":
+  version: 5.11.8
+  resolution: "systeminformation@npm:5.11.8"
+  bin:
+    systeminformation: lib/cli.js
+  checksum: f8bd66a07a60c814ed30d0c311af434d88510da714880e62c9c826fbcf36ef322ae2a0993d4a67446426670fa0ec2cbc2dc87224902373fa7ba958c3b80162b0
+  conditions: (os=darwin | os=linux | os=win32 | os=freebsd | os=openbsd | os=netbsd | os=sunos | os=android)
   languageName: node
   linkType: hard
 

@@ -55,6 +55,7 @@
 		"ioredis": "^4.28.5",
 		"redis-info": "^3.1.0",
 		"reflect-metadata": "^0.1.13",
+		"systeminformation": "^5.11.8",
 		"uWebSockets.js": "uNetworking/uWebSockets.js#v20.6.0",
 		"utf-8-validate": "^5.0.9",
 		"zlib-sync": "^0.1.7"
