@@ -26,15 +26,17 @@ interface CachedData {
 }
 
 const PageLabels = [
-	'ℹ️ - General Information',
-	'🧠 - Personality',
-	'👊 - Talents',
-	'👑 - Artifacts',
-	'🤺 - Weapons',
-	'🌟 - Constellations',
-	'💸 - Ascension Materials',
-	'💰 - Talent Materials'
+	'General Information',
+	'Personality',
+	'Talents',
+	'Artifacts',
+	'Weapons',
+	'Constellations',
+	'Ascension Materials',
+	'Talent Materials'
 ];
+
+const PageEmojis = ['📚', '🧠', '👊', '👑', '⚔️', '🌟', '💸', '💰'];
 
 @ApplyOptions<ChatInputCommand.Options>({
 	description: 'Shows information about a specific character.'
@@ -70,10 +72,10 @@ export class SlashCommand extends DilucCommand {
 				.setAuthor({ name: `${character.name} | ${character.rarity}★`, iconURL: elementImages[character.element] })
 				.setThumbnail(character.images.icon)
 		})
-			.setSelectMenuOptions((pageIndex) => ({ label: PageLabels[pageIndex - 1] }))
+			.setSelectMenuOptions((pageIndex) => ({ label: PageLabels[pageIndex - 1], emoji: PageEmojis[pageIndex - 1] }))
 			.addPageEmbed((embed) =>
 				embed
-					.setTitle('ℹ️ - General Information')
+					.setTitle('General Information')
 					.setDescription(character.description)
 					.addField('Gender', character.gender, true)
 					.addField('Birthday', character.birthday, true)
@@ -82,7 +84,7 @@ export class SlashCommand extends DilucCommand {
 					.addField('Affiliation', character.affiliation, true)
 					.addField('Title', character.title, true)
 			)
-			.addPageEmbed((embed) => embed.setTitle(`🧠 - Personality`).setDescription(personality))
+			.addPageEmbed((embed) => embed.setTitle(`Personality`).setDescription(personality))
 			.addPageEmbed((embed) => {
 				let talentText = stripIndents`
 					*Priority: ${talentPriority.join(' → ')}*
@@ -106,7 +108,7 @@ export class SlashCommand extends DilucCommand {
 				if (typeof talent.passive3 !== 'undefined') talentText += `\n\n***${talent.passive3.name}***\n${talent.passive3.info}`;
 				if (typeof talent.passive4 !== 'undefined') talentText += `\n\n***${talent.passive4.name}***\n${talent.passive4.info}`;
 
-				return embed.setTitle('👊 - Talents').setDescription(talentText);
+				return embed.setTitle('Talents').setDescription(talentText);
 			})
 			.addPageEmbed((embed) => {
 				const artifactText = stripIndents`
@@ -124,9 +126,9 @@ export class SlashCommand extends DilucCommand {
 					${artifacts.map((artifact) => `__${artifact}__`).join('\n')}
 				`;
 
-				return embed.setTitle('👑 - Artifacts').setDescription(artifactText);
+				return embed.setTitle('Artifacts').setDescription(artifactText);
 			})
-			.addPageEmbed((embed) => embed.setTitle('🤺 - Weapons').setDescription(weapons.join('\n')))
+			.addPageEmbed((embed) => embed.setTitle('Weapons').setDescription(weapons.join('\n')))
 			.addPageEmbed((embed) => {
 				const consText = stripIndents`
 					**${constellations.c1.name} (C1)**
@@ -148,7 +150,7 @@ export class SlashCommand extends DilucCommand {
 					${constellations.c6.effect}
 				`;
 
-				return embed.setTitle('🌟 - Constellations').setDescription(consText);
+				return embed.setTitle('Constellations').setDescription(consText);
 			})
 			.addPageEmbed((embed) => {
 				const fmt = new Intl.NumberFormat();
@@ -161,7 +163,7 @@ export class SlashCommand extends DilucCommand {
 					**Ascension Level 6:** ${character.costs.ascend6.map((item) => `${fmt.format(item.count)} ${item.name}`).join(', ')}
 				`;
 
-				return embed.setTitle('💸 - Ascension Materials').setDescription(ascText);
+				return embed.setTitle('Ascension Materials').setDescription(ascText);
 			})
 			.addPageEmbed((embed) => {
 				const fmt = new Intl.NumberFormat();
@@ -177,7 +179,7 @@ export class SlashCommand extends DilucCommand {
 					**Talent Level 10:** ${talent.costs.lvl10.map((item) => `${fmt.format(item.count)} ${item.name}`).join(', ')}
 				`;
 
-				return embed.setTitle('💰 - Talent Materials').setDescription(talentText);
+				return embed.setTitle('Talent Materials').setDescription(talentText);
 			});
 
 		return page.run(interaction);
