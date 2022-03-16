@@ -36,7 +36,7 @@ export const initializeWs = async () => {
 	app.get('/stats', async (res) => {
 		res.onAborted(() => (res.aborted = true));
 
-		const mem = await sys.mem();
+		const mem = process.memoryUsage();
 		const cpu = await sys.cpu();
 		const os = await sys.osInfo();
 		const docker = await sys.dockerInfo();
@@ -47,7 +47,7 @@ export const initializeWs = async () => {
 			ping: container.client.ws.ping,
 			users: container.client.guilds.cache.reduce((acc, guild) => acc + (guild.memberCount ?? 0), 0),
 			servers: container.client.guilds.cache.size,
-			ram: `${Math.round((mem.used / 1024 / 1024) * 100) / 100} MB`,
+			ram: `${Math.round((mem.heapUsed / 1024 / 1024) * 100) / 100} MB`,
 			redisVersion: redis_version,
 			nodeVersion: process.version,
 			cpu: `${cpu.manufacturer} ${cpu.brand}`,
