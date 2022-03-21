@@ -986,9 +986,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bull@npm:^4.8.0":
-  version: 4.8.0
-  resolution: "bull@npm:4.8.0"
+"bull@npm:^4.8.1":
+  version: 4.8.1
+  resolution: "bull@npm:4.8.1"
   dependencies:
     cron-parser: ^4.2.1
     debuglog: ^1.0.0
@@ -999,7 +999,7 @@ __metadata:
     p-timeout: ^3.2.0
     semver: ^7.3.2
     uuid: ^8.3.0
-  checksum: ed9f2a67ca532c05e451ab91986917237075039fc39c492236886dcfb8a1fada6e150fcf7ba1c2c1e8d133b79c08896cca2a71d8a726474ee0be21dc26795281
+  checksum: dd8147c9ace168e33cf12e710fecfd7ed5e4f9c05c4006f993fbfcdee8de45efcac8a0427cdf6f1cd5cb347cc7c2049f7fa8c936f3abf40404cd0c1bbd70a7b3
   languageName: node
   linkType: hard
 
@@ -1319,7 +1319,7 @@ __metadata:
     "@typescript-eslint/eslint-plugin": ^5.15.0
     "@yukikaze-bot/erlpack": ^1.0.1
     bufferutil: ^4.0.6
-    bull: ^4.8.0
+    bull: ^4.8.1
     colorette: ^2.0.16
     common-tags: ^1.8.2
     dayjs: ^1.11.0
