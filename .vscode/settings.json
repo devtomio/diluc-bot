@@ -4,6 +4,7 @@
 		"Anemo",
 		"Ayaka",
 		"Beidou",
+		"combatsp",
 		"Crepus",
 		"Cryo",
 		"cucurbitophobia",
@@ -21,6 +22,10 @@
 		"guuji",
 		"Guuji's",
 		"headpats",
+		"hexists",
+		"hget",
+		"hgetall",
+		"hset",
 		"Inazuma",
 		"Inazuman",
 		"Kaedehara",
@@ -29,7 +34,11 @@
 		"kitsune",
 		"Kokomi",
 		"Kujou",
+		"libm",
 		"Liyue",
+		"lpush",
+		"lrange",
+		"lrem",
 		"Miko",
 		"Mitternachtsbrot",
 		"monbrey",
@@ -58,5 +67,13 @@
 		"Wolvendom",
 		"Xiangling",
 		"Xinyan"
-	]
+	],
+	"cSpell.customDictionaries": {
+		"custom-dictionary-workspace": {
+			"name": "custom-dictionary-workspace",
+			"path": "${workspaceFolder:diluc-bot}/.cspell/custom-dictionary-workspace.txt",
+			"addWords": true,
+			"scope": "workspace"
+		}
+	}
 }

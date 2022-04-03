@@ -28,3 +28,8 @@ wiki/
 .env
 .swc/
 test/
+
+
+# Added by cargo
+
+/target
