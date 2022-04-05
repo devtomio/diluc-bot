@@ -2,6 +2,7 @@ use redis::{AsyncCommands, Client};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
 use std::{ops::Index, str::FromStr};
+use strum_macros::Display;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -88,6 +89,28 @@ pub struct Ascend6 {
     pub count: i64,
 }
 
+#[derive(Display, Debug)]
+pub enum Element {
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Geo.png")]
+    Geo,
+
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Cryo.png")]
+    Cryo,
+
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Pyro.png")]
+    Pyro,
+
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Hydro.png")]
+    Hydro,
+
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png")]
+    Electro,
+
+    #[strum(serialize = "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Anemo.png")]
+    Anemo,
+}
+
+#[derive(Debug)]
 pub enum Character {
     Diluc,
 }
@@ -110,8 +133,7 @@ pub struct Info {
     pub color: (u8, u8, u8),
     pub rawname: String,
     pub image: String,
-    pub element: String,
-    pub build: String,
+    pub element: Element,
 }
 
 pub fn get_additional_info(name: Character) -> Info {
@@ -119,7 +141,7 @@ pub fn get_additional_info(name: Character) -> Info {
         Character::Diluc => Info {
             color: (217, 65, 33),
             rawname: "diluc".to_owned(),
-            element: "https://gi-builds.sfo3.digitaloceanspaces.com/elements/Electro.png".to_owned(),
+            element: Element::Pyro,
             image: "https://static.wikia.nocookie.net/gensin-impact/images/0/02/Character_Diluc_Thumb.png".to_owned(),
             personality: "\
             Kaeya and Diluc refer to themselves as \"anti-heroes with attitude issues.\" He decided to take matters into his own hands and became the \"Darknight Hero\" to defend the people of Mondstadt, much to his chagrin and disgrace.
@@ -127,9 +149,6 @@ pub fn get_additional_info(name: Character) -> Info {
 			Diluc was once a perfect young man, committed to the Knights of Favonius' cause. His confidence in the Knights was destroyed after his father died prematurely as a result of using a Delusion, as well as Inspector Eroch instructing Diluc to cover up the occurrence. Even after being expelled from the Knights for being a traitor, Eroch still retains grudges against them. He believes the Knights take too long to complete tasks, yet he still admires those that put up the effort, such as Lisa and Jean.
 
 			He admired his father, Crepus, while he was a member of the Knights. Being commended by his father made him happier than fame or anything else, and Crepus advised Diluc to carry out his responsibilities faithfully. He has been repressing himself since his father's death. He has a soft, tender, and modest character, despite coming out as sour and gloomy in his voice. Diluc used to be a lively and pleasant person, but that is no longer the case.
-            ".to_owned(),
-            build: "\
-            **Weapons**
             ".to_owned()
         }
     }
