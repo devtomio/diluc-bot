@@ -169,7 +169,7 @@ pub async fn character(
             get_artifact(recommended_artifact.set_1.replace('_', ""), &data.redis).await;
 
         if recommended_artifact.set_2.is_none() {
-            artifact_text.push_str(&format!("\n__4pc {}__", set1_info.name));
+            artifact_text.push_str(&format!("__4pc {}__\n", set1_info.name));
         } else {
             let set2_info = get_artifact(
                 recommended_artifact.set_2.unwrap().replace('_', ""),
@@ -178,7 +178,7 @@ pub async fn character(
             .await;
 
             artifact_text.push_str(&format!(
-                "\n__2pc {} & 2pc {}__",
+                "__2pc {} & 2pc {}__\n",
                 set1_info.name, set2_info.name
             ));
         }
