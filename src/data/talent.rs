@@ -4,7 +4,7 @@ use serde_json::{from_str, to_string};
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct Talents {
+pub struct Talent {
     pub name: String,
     pub combat1: Combat1,
     pub combat2: Combat2,
@@ -175,32 +175,32 @@ pub struct Lvl10 {
     pub count: i64,
 }
 
-pub async fn get_talents(name: String, redis: Client) -> Talents {
+pub async fn get_talent(name: &str, redis: &Client) -> Talent {
     let mut con = redis.get_async_connection().await.unwrap();
-    let cached: Option<String> = match con.get(format!("{}-talents", name.clone())).await {
+    let cached: Option<String> = match con.get(format!("{}-talents", name)).await {
         Ok(v) => Some(v),
         Err(_) => None,
     };
 
     match cached {
         Some(raw) => {
-            let val: Talents = from_str(&raw).unwrap();
+            let val: Talent = from_str(&raw).unwrap();
 
             val
         }
         None => {
-            let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/talents/{}.json", name);
+            let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/talents/{name}.json");
             let json = reqwest::get(url)
                 .await
                 .unwrap()
-                .json::<Talents>()
+                .json::<Talent>()
                 .await
                 .unwrap();
 
             let _: String = con
                 .set_ex(
                     format!("{name}-talents"),
-                    to_string::<Talents>(&json).unwrap(),
+                    to_string::<Talent>(&json).unwrap(),
                     604800,
                 )
                 .await

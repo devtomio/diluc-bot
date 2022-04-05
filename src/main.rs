@@ -1,3 +1,6 @@
+#[macro_use]
+extern crate log;
+
 use redis::{Client, Script};
 use std::{env::var, fs::read_to_string};
 
@@ -17,11 +20,11 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     match error {
         poise::FrameworkError::Setup { error } => panic!("Failed to start bot: {:?}", error),
         poise::FrameworkError::Command { error, ctx } => {
-            println!("Error in command `{}`: {:?}", ctx.command().name, error,);
+            error!("Error in command `{}`: {:?}", ctx.command().name, error,);
         }
         error => {
             if let Err(e) = poise::builtins::on_error(error).await {
-                println!("Error while handling error: {}", e)
+                error!("Error while handling error: {}", e)
             }
         }
     }
@@ -29,6 +32,8 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 
 #[tokio::main]
 async fn main() {
+    pretty_env_logger::init();
+
     let redis = Client::open(var("REDIS_URL").unwrap()).unwrap();
     let lua_script = read_to_string("redis/fuzzySearch.lua").unwrap();
     let options = poise::FrameworkOptions {
@@ -39,6 +44,16 @@ async fn main() {
             ..Default::default()
         },
         on_error: |error| Box::pin(on_error(error)),
+        post_command: |ctx| {
+            Box::pin(async move {
+                info!(
+                    "Command \"{}\" was executed by {} [{}]",
+                    ctx.command().qualified_name,
+                    ctx.author().tag(),
+                    ctx.author().id
+                );
+            })
+        },
         ..Default::default()
     };
 

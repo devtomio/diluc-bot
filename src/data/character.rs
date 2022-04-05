@@ -135,9 +135,9 @@ pub fn get_additional_info(name: Character) -> Info {
     }
 }
 
-pub async fn get_info(name: String, redis: Client) -> CharacterInfo {
+pub async fn get_info(name: &str, redis: &Client) -> CharacterInfo {
     let mut con = redis.get_async_connection().await.unwrap();
-    let cached: Option<String> = match con.get(name.clone()).await {
+    let cached: Option<String> = match con.get(name).await {
         Ok(v) => Some(v),
         Err(_) => None,
     };
@@ -149,7 +149,7 @@ pub async fn get_info(name: String, redis: Client) -> CharacterInfo {
             val
         }
         None => {
-            let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/characters/{}.json", name);
+            let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/characters/{name}.json");
             let json = reqwest::get(url)
                 .await
                 .unwrap()
@@ -167,7 +167,7 @@ pub async fn get_info(name: String, redis: Client) -> CharacterInfo {
     }
 }
 
-pub async fn get_build_info(name: String, redis: Client) -> Build {
+pub async fn get_build_info(name: &str, redis: &Client) -> Build {
     let mut con = redis.get_async_connection().await.unwrap();
     let cached: Option<String> = match con.get("character_build_info").await {
         Ok(v) => Some(v),
@@ -177,7 +177,7 @@ pub async fn get_build_info(name: String, redis: Client) -> Build {
     match cached {
         Some(raw) => {
             let val: OtherInfo = from_str(&raw).unwrap();
-            let build: &Vec<Build> = &val[&name.clone()];
+            let build: &Vec<Build> = &val[name];
 
             build.get(0).unwrap().to_owned()
         }
@@ -199,7 +199,7 @@ pub async fn get_build_info(name: String, redis: Client) -> Build {
                 .await
                 .unwrap();
 
-            let build: &Vec<Build> = &json[&name.clone()];
+            let build: &Vec<Build> = &json[name];
 
             build.get(0).unwrap().to_owned()
         }

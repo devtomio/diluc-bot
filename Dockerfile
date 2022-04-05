@@ -6,7 +6,7 @@ ENV CI=true
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends build-essential python3 dumb-init libssl-dev pkg-config && \
+    apt-get install -y --no-install-recommends build-essential python3 dumb-init lld libssl-dev pkg-config && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove

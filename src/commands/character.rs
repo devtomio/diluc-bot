@@ -1,7 +1,8 @@
 use crate::{
     data::{
+        artifact::get_artifact,
         character::{get_additional_info, get_build_info, get_info, Character, CHARACTER_LIST},
-        talents::get_talents,
+        talent::get_talent,
     },
     Context, Error,
 };
@@ -28,15 +29,16 @@ pub async fn character(
 
     let data = ctx.data();
     let additional_info = get_additional_info(Character::from_str(&name).unwrap());
-    let info = get_info(additional_info.rawname.clone(), data.redis.clone()).await;
-    let build = get_build_info(name, data.redis.clone()).await;
-    let talents = get_talents(additional_info.rawname, data.redis.clone()).await;
+    let info = get_info(&additional_info.rawname, &data.redis).await;
+    let build = get_build_info(&name, &data.redis).await;
+    let talents = get_talent(&additional_info.rawname, &data.redis).await;
+
     let mut pg1 = serenity::CreateEmbed::default();
 
     pg1.title("General Information")
         .author(|a| {
             a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(additional_info.element.clone())
+                .icon_url(&additional_info.element)
         })
         .description(info.description)
         .field("Gender", info.gender, true)
@@ -46,17 +48,17 @@ pub async fn character(
         .field("Affiliation", info.affiliation, true)
         .field("Title", info.title, true)
         .color(additional_info.color)
-        .thumbnail(additional_info.image.clone());
+        .thumbnail(&additional_info.image);
 
     let mut pg2 = serenity::CreateEmbed::default();
 
     pg2.title("Personality")
         .author(|a| {
             a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(additional_info.element.clone())
+                .icon_url(&additional_info.element)
         })
         .color(additional_info.color)
-        .thumbnail(additional_info.image.clone())
+        .thumbnail(&additional_info.image)
         .description(additional_info.personality);
 
     let mut pg3 = serenity::CreateEmbed::default();
@@ -132,14 +134,64 @@ pub async fn character(
     pg3.title("Talents")
         .author(|a| {
             a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(additional_info.element)
+                .icon_url(&additional_info.element)
         })
         .color(additional_info.color)
-        .thumbnail(additional_info.image)
+        .thumbnail(&additional_info.image)
         .description(talent_text);
 
+    let mut pg4 = serenity::CreateEmbed::default();
+    let mut artifact_text = format!(
+        "\
+        **Main Stats**
+        Flower of Life: {}
+        Plume of Death: {}
+        Sands of Eon: {}
+        Goblet of Eonothem: {}
+        Circlet of Logos: {}
+
+        **Sub-stats**
+        {}
+    ",
+        build.stats.flower.join(" / "),
+        build.stats.plume.join(" / "),
+        build.stats.sands.join(" / "),
+        build.stats.goblet.join(" / "),
+        build.stats.circlet.join(" / "),
+        build.stats_priority.join(" / ")
+    );
+
+    for recommended_artifact in build.sets {
+        let set1_info =
+            get_artifact(recommended_artifact.set_1.replace('_', ""), &data.redis).await;
+
+        if recommended_artifact.set_2.is_none() {
+            artifact_text.push_str(&format!("\n__4pc {}__", set1_info.name));
+        } else {
+            let set2_info = get_artifact(
+                recommended_artifact.set_2.unwrap().replace('_', ""),
+                &data.redis,
+            )
+            .await;
+
+            artifact_text.push_str(&format!(
+                "\n__2pc {} & 2pc {}__",
+                set1_info.name, set2_info.name
+            ));
+        }
+    }
+
+    pg4.title("Artifacts")
+        .author(|a| {
+            a.name(format!("{} | {}★", info.name, info.rarity))
+                .icon_url(&additional_info.element)
+        })
+        .color(additional_info.color)
+        .thumbnail(&additional_info.image)
+        .description(artifact_text);
+
     let mut index = 0;
-    let pages = vec![pg1.clone(), pg2.clone(), pg3.clone()];
+    let pages: Vec<serenity::CreateEmbed> = vec![pg1.clone(), pg2.clone(), pg3.clone()];
     let msg = ctx
         .send(|m| {
             m.embed(|e| {
@@ -202,11 +254,10 @@ pub async fn character(
     let mut message = msg.message().await?;
 
     loop {
-        let collector = message
-            .await_component_interaction(&ctx.discord().shard)
-            .timeout(Duration::from_secs(360))
+        let collector = serenity::CollectComponentInteraction::new(ctx.discord())
             .author_id(ctx.author().id)
-            .collect_limit(1);
+            .collect_limit(1)
+            .timeout(Duration::from_secs(360));
 
         let interaction = match collector.await {
             Some(i) => i,
@@ -235,12 +286,16 @@ pub async fn character(
             }
         };
 
+        interaction.defer(ctx.discord()).await?;
+
         let data = &interaction.data;
 
         match data.component_type {
             serenity::ComponentType::SelectMenu => match &data.custom_id[..] {
                 "go_to_page" => match &data.values[0][..] {
                     "General Information" => {
+                        index = 1;
+
                         message
                             .edit(ctx.discord(), |m| {
                                 m.embed(|e| {
@@ -261,6 +316,8 @@ pub async fn character(
                             .await?
                     }
                     "Personality" => {
+                        index = 2;
+
                         message
                             .edit(ctx.discord(), |m| {
                                 m.embed(|e| {
@@ -281,6 +338,8 @@ pub async fn character(
                             .await?
                     }
                     "Talents" => {
+                        index = 3;
+
                         message
                             .edit(ctx.discord(), |m| {
                                 m.embed(|e| {
@@ -426,8 +485,6 @@ pub async fn character(
             },
             _ => unreachable!(),
         };
-
-        interaction.defer(ctx.discord()).await?;
     }
 
     Ok(())

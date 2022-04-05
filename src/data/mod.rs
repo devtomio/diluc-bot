@@ -1,2 +1,3 @@
+pub mod artifact;
 pub mod character;
-pub mod talents;
+pub mod talent;
