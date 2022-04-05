@@ -164,6 +164,8 @@ pub async fn character(
         build.stats_priority.join(" / ")
     );
 
+    println!("{:?}", build.sets);
+
     for recommended_artifact in build.sets {
         let set1_info =
             get_artifact(recommended_artifact.set_1.replace('_', ""), &data.redis).await;

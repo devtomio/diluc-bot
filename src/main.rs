@@ -1,8 +1,10 @@
 #[macro_use]
-extern crate log;
+extern crate tracing;
 
 use redis::{Client, Script};
 use std::{env::var, fs::read_to_string};
+use tracing_subscriber::FmtSubscriber;
+use tracing::Level;
 
 mod commands;
 pub mod data;
@@ -32,7 +34,9 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 
 #[tokio::main]
 async fn main() {
-    pretty_env_logger::init();
+    let subscriber = FmtSubscriber::builder().with_max_level(Level::DEBUG).finish();
+
+    tracing::subscriber::set_global_default(subscriber).unwrap();
 
     let redis = Client::open(var("REDIS_URL").unwrap()).unwrap();
     let lua_script = read_to_string("redis/fuzzySearch.lua").unwrap();
