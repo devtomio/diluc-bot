@@ -214,7 +214,7 @@ pub async fn character(
         let weapon_info = get_weapon(&id, &data.redis).await;
 
         weapon_text.push_str(&format!(
-            "**{}**\nSub-stat: {}\n",
+            "**{}**\nSub-stat: {}\n\n",
             weapon_info.name, weapon_info.substat
         ));
     }
