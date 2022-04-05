@@ -191,7 +191,8 @@ pub async fn character(
         .description(artifact_text);
 
     let mut index = 0;
-    let pages: Vec<serenity::CreateEmbed> = vec![pg1.clone(), pg2.clone(), pg3.clone()];
+    let pages: Vec<serenity::CreateEmbed> =
+        vec![pg1.clone(), pg2.clone(), pg3.clone(), pg4.clone()];
     let msg = ctx
         .send(|m| {
             m.embed(|e| {
@@ -244,6 +245,7 @@ pub async fn character(
                             })
                             .create_option(|os| os.label("Personality").value("Personality"))
                             .create_option(|os| os.label("Talents").value("Talents"))
+                            .create_option(|os| os.label("Artifacts").value("Artifacts"))
                         })
                     })
                 })
@@ -344,6 +346,28 @@ pub async fn character(
                             .edit(ctx.discord(), |m| {
                                 m.embed(|e| {
                                     *e = pg3.clone();
+
+                                    e.footer(|f| {
+                                        f.text(format!(
+                                            "{} | {}/{}",
+                                            info.constellation,
+                                            index + 1,
+                                            pages.len()
+                                        ))
+                                    });
+
+                                    e
+                                })
+                            })
+                            .await?
+                    }
+                    "Artifacts" => {
+                        index = 4;
+
+                        message
+                            .edit(ctx.discord(), |m| {
+                                m.embed(|e| {
+                                    *e = pg4.clone();
 
                                     e.footer(|f| {
                                         f.text(format!(
