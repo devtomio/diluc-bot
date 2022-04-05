@@ -2,14 +2,24 @@ use crate::{
     data::{
         artifact::get_artifact,
         character::{get_additional_info, get_build_info, get_info, Character, CHARACTER_LIST},
+        constellation::get_constellation,
         talent::get_talent,
+        weapon::get_weapon,
     },
     Context, Error,
 };
 use fuse_rust::Fuse;
 use futures::{Stream, StreamExt};
+use num_format::{Buffer, Locale};
 use poise::serenity_prelude as serenity;
 use std::{str::FromStr, time::Duration};
+
+fn format_number(n: &i64) -> String {
+    let mut buf = Buffer::default();
+
+    buf.write_formatted(n, &Locale::en);
+    buf.to_string()
+}
 
 async fn autocomplete_character(_ctx: Context<'_>, partial: String) -> impl Stream<Item = String> {
     let fuse = Fuse::default();
@@ -33,6 +43,7 @@ pub async fn character(
     let info = get_info(&additional_info.rawname, &data.redis).await;
     let build = get_build_info(&name, &data.redis).await;
     let talents = get_talent(&additional_info.rawname, &data.redis).await;
+    let cons = get_constellation(&additional_info.rawname, &data.redis).await;
 
     let mut pg1 = serenity::CreateEmbed::default();
 
@@ -195,9 +206,228 @@ pub async fn character(
         .thumbnail(&additional_info.image)
         .description(artifact_text);
 
+    let mut pg5 = serenity::CreateEmbed::default();
+    let mut weapon_text = String::new();
+
+    for weapon in build.weapons {
+        let id = weapon.id.replace('_', "");
+        let weapon_info = get_weapon(&id, &data.redis).await;
+
+        weapon_text.push_str(&format!(
+            "**{}**\nSub-stat: {}\n",
+            weapon_info.name, weapon_info.substat
+        ));
+    }
+
+    pg5.title("Weapons")
+        .author(|a| {
+            a.name(format!("{} | {}★", info.name, info.rarity))
+                .icon_url(&additional_info.element)
+        })
+        .color(additional_info.color)
+        .thumbnail(&additional_info.image)
+        .description(weapon_text);
+
+    let mut pg6 = serenity::CreateEmbed::default();
+    let constellation_text = format!(
+        "\
+        **{} (C1)**
+        {}
+
+        **{} (C2)**
+        {}
+
+        **{} (C3)**
+        {}
+
+        **{} (C4)**
+        {}
+
+        **{} (C5)**
+        {}
+
+        **{} (C6)**
+        {}
+    ",
+        cons.c1.name,
+        cons.c1.effect,
+        cons.c2.name,
+        cons.c2.effect,
+        cons.c3.name,
+        cons.c3.effect,
+        cons.c4.name,
+        cons.c4.effect,
+        cons.c5.name,
+        cons.c5.effect,
+        cons.c6.name,
+        cons.c6.effect
+    );
+
+    pg6.title("Constellations")
+        .author(|a| {
+            a.name(format!("{} | {}★", info.name, info.rarity))
+                .icon_url(&additional_info.element)
+        })
+        .color(additional_info.color)
+        .thumbnail(&additional_info.image)
+        .description(constellation_text);
+
+    let mut pg7 = serenity::CreateEmbed::default();
+    let ascension_materials_text = format!(
+        "\
+        **Ascension Level 1:** {}
+        **Ascension Level 2:** {}
+        **Ascension Level 3:** {}
+        **Ascension Level 4:** {}
+        **Ascension Level 5:** {}
+        **Ascension Level 6:** {}
+    ",
+        info.costs
+            .ascend1
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        info.costs
+            .ascend2
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        info.costs
+            .ascend3
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        info.costs
+            .ascend4
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        info.costs
+            .ascend5
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        info.costs
+            .ascend6
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+
+    pg7.title("Ascension Materials")
+        .author(|a| {
+            a.name(format!("{} | {}★", info.name, info.rarity))
+                .icon_url(&additional_info.element)
+        })
+        .color(additional_info.color)
+        .thumbnail(&additional_info.image)
+        .description(ascension_materials_text);
+
+    let mut pg8 = serenity::CreateEmbed::default();
+    let talent_materials_text = format!(
+        "\
+        **Talent Level 2:** {}
+        **Talent Level 3:** {}
+        **Talent Level 4:** {}
+        **Talent Level 5:** {}
+        **Talent Level 6:** {}
+        **Talent Level 7:** {}
+        **Talent Level 8:** {}
+        **Talent Level 9:** {}
+        **Talent Level 10:** {}
+    ",
+        talents
+            .costs
+            .lvl2
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl3
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl4
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl5
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl6
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl7
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl8
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl9
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", "),
+        talents
+            .costs
+            .lvl10
+            .iter()
+            .map(|c| format!("{} {}", format_number(&c.count), c.name))
+            .collect::<Vec<_>>()
+            .join(", ")
+    );
+
+    pg8.title("Talent Materials")
+        .author(|a| {
+            a.name(format!("{} | {}★", info.name, info.rarity))
+                .icon_url(&additional_info.element)
+        })
+        .color(additional_info.color)
+        .thumbnail(&additional_info.image)
+        .description(talent_materials_text);
+
     let mut index = 0;
-    let pages: Vec<serenity::CreateEmbed> =
-        vec![pg1.clone(), pg2.clone(), pg3.clone(), pg4.clone()];
+    let pages: Vec<serenity::CreateEmbed> = vec![
+        pg1.clone(),
+        pg2.clone(),
+        pg3.clone(),
+        pg4.clone(),
+        pg5.clone(),
+        pg6.clone(),
+        pg7.clone(),
+        pg8.clone(),
+    ];
+
     let msg = ctx
         .send(|m| {
             m.embed(|e| {
@@ -251,6 +481,14 @@ pub async fn character(
                             .create_option(|os| os.label("Personality").value("Personality"))
                             .create_option(|os| os.label("Talents").value("Talents"))
                             .create_option(|os| os.label("Artifacts").value("Artifacts"))
+                            .create_option(|os| os.label("Weapons").value("Weapons"))
+                            .create_option(|os| os.label("Constellations").value("Constellations"))
+                            .create_option(|os| {
+                                os.label("Ascension Materials").value("Ascension Materials")
+                            })
+                            .create_option(|os| {
+                                os.label("Talent Materials").value("Talent Materials")
+                            })
                         })
                     })
                 })
@@ -373,6 +611,94 @@ pub async fn character(
                             .edit(ctx.discord(), |m| {
                                 m.embed(|e| {
                                     *e = pg4.clone();
+
+                                    e.footer(|f| {
+                                        f.text(format!(
+                                            "{} | {}/{}",
+                                            info.constellation,
+                                            index + 1,
+                                            pages.len()
+                                        ))
+                                    });
+
+                                    e
+                                })
+                            })
+                            .await?
+                    }
+                    "Weapons" => {
+                        index = 5;
+
+                        message
+                            .edit(ctx.discord(), |m| {
+                                m.embed(|e| {
+                                    *e = pg5.clone();
+
+                                    e.footer(|f| {
+                                        f.text(format!(
+                                            "{} | {}/{}",
+                                            info.constellation,
+                                            index + 1,
+                                            pages.len()
+                                        ))
+                                    });
+
+                                    e
+                                })
+                            })
+                            .await?
+                    }
+                    "Constellations" => {
+                        index = 6;
+
+                        message
+                            .edit(ctx.discord(), |m| {
+                                m.embed(|e| {
+                                    *e = pg6.clone();
+
+                                    e.footer(|f| {
+                                        f.text(format!(
+                                            "{} | {}/{}",
+                                            info.constellation,
+                                            index + 1,
+                                            pages.len()
+                                        ))
+                                    });
+
+                                    e
+                                })
+                            })
+                            .await?
+                    }
+                    "Ascension Materials" => {
+                        index = 7;
+
+                        message
+                            .edit(ctx.discord(), |m| {
+                                m.embed(|e| {
+                                    *e = pg7.clone();
+
+                                    e.footer(|f| {
+                                        f.text(format!(
+                                            "{} | {}/{}",
+                                            info.constellation,
+                                            index + 1,
+                                            pages.len()
+                                        ))
+                                    });
+
+                                    e
+                                })
+                            })
+                            .await?
+                    }
+                    "Talent Materials" => {
+                        index = 8;
+
+                        message
+                            .edit(ctx.discord(), |m| {
+                                m.embed(|e| {
+                                    *e = pg8.clone();
 
                                     e.footer(|f| {
                                         f.text(format!(

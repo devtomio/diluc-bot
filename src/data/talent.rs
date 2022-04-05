@@ -177,7 +177,7 @@ pub struct Lvl10 {
 
 pub async fn get_talent(name: &str, redis: &Client) -> Talent {
     let mut con = redis.get_async_connection().await.unwrap();
-    let cached: Option<String> = match con.get(format!("{}-talents", name)).await {
+    let cached: Option<String> = match con.get(format!("{name}-talents")).await {
         Ok(v) => Some(v),
         Err(_) => None,
     };

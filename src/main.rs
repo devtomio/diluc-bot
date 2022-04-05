@@ -3,8 +3,8 @@ extern crate tracing;
 
 use redis::{Client, Script};
 use std::{env::var, fs::read_to_string};
-use tracing_subscriber::FmtSubscriber;
 use tracing::Level;
+use tracing_subscriber::FmtSubscriber;
 
 mod commands;
 pub mod data;
@@ -34,7 +34,9 @@ async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
 
 #[tokio::main]
 async fn main() {
-    let subscriber = FmtSubscriber::builder().with_max_level(Level::DEBUG).finish();
+    let subscriber = FmtSubscriber::builder()
+        .with_max_level(Level::INFO)
+        .finish();
 
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
