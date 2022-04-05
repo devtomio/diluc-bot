@@ -18,6 +18,7 @@ async fn autocomplete_character(_ctx: Context<'_>, partial: String) -> impl Stre
     futures::stream::iter(results).map(|res| CHARACTER_LIST[res.index].to_string())
 }
 
+/// Shows information about a specific character.
 #[poise::command(slash_command)]
 pub async fn character(
     ctx: Context<'_>,
@@ -152,6 +153,8 @@ pub async fn character(
 
         **Sub-stats**
         {}
+
+        **Artifact Sets**
     ",
         build.stats.flower.join(" / "),
         build.stats.plume.join(" / "),
