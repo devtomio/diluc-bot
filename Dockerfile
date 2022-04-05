@@ -7,6 +7,7 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
+ENV LD_LIBRARY_PATH=/usr/local/lib:/usr/local/lib64
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
