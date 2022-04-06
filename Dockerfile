@@ -1,36 +1,30 @@
-FROM duskmoon/cargo-chef:nightly AS chef
-WORKDIR /app
+FROM rustlang/rust:nightly-bullseye-slim as base
 
-FROM chef AS planner
-COPY . .
-RUN cargo chef prepare --recipe-path recipe.json
+WORKDIR /usr/src/app
 
-FROM chef AS builder
-COPY --from=planner /app/recipe.json recipe.json
+ENV CI=true
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends build-essential lld libssl-dev pkg-config && \
+    apt-get install -y --no-install-recommends build-essential python3 dumb-init lld libssl-dev pkg-config && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove
 
-RUN cargo chef cook --release --recipe-path recipe.json
-COPY . .
+ENTRYPOINT ["dumb-init", "--"]
 
-RUN cargo build --release --bin diluc-bot
+FROM base as builder
 
-FROM debian:buster-slim AS runtime
-WORKDIR /app
+COPY Cargo.lock .
+COPY Cargo.toml .
+COPY redis/ redis/
+COPY src/ src/
 
-COPY --from=builder /app/target/release/diluc-bot /usr/local/bin
-COPY --from=planner /app/redis redis/
+RUN cargo install --path .
 
-RUN apt-get update && \
-    apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends build-essential lld libssl-dev pkg-config && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/* && \
-    apt-get autoremove
+FROM base as runner
+
+COPY --from=builder /usr/src/app/redis ./redis
+COPY --from=builder /usr/local/cargo/bin/diluc-bot /usr/local/bin/diluc-bot
 
 ENTRYPOINT ["/usr/local/bin/diluc-bot"]
