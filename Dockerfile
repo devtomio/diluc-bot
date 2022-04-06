@@ -24,6 +24,8 @@ FROM debian:buster-slim AS runtime
 WORKDIR /app
 
 COPY --from=builder /app/target/release/diluc-bot /usr/local/bin
+COPY --from=planner /app/redis redis/
+
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
     apt-get install -y --no-install-recommends build-essential lld libssl-dev pkg-config && \
