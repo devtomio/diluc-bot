@@ -476,18 +476,44 @@ pub async fn character(
                     r.create_select_menu(|m| {
                         m.custom_id("go_to_page").options(|o| {
                             o.create_option(|os| {
-                                os.label("General Information").value("General Information")
-                            })
-                            .create_option(|os| os.label("Personality").value("Personality"))
-                            .create_option(|os| os.label("Talents").value("Talents"))
-                            .create_option(|os| os.label("Artifacts").value("Artifacts"))
-                            .create_option(|os| os.label("Weapons").value("Weapons"))
-                            .create_option(|os| os.label("Constellations").value("Constellations"))
-                            .create_option(|os| {
-                                os.label("Ascension Materials").value("Ascension Materials")
+                                os.label("General Information")
+                                    .value("General Information")
+                                    .emoji(serenity::ReactionType::Unicode("📚".to_owned()))
                             })
                             .create_option(|os| {
-                                os.label("Talent Materials").value("Talent Materials")
+                                os.label("Personality")
+                                    .value("Personality")
+                                    .emoji(serenity::ReactionType::Unicode("🧠".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Talents")
+                                    .value("Talents")
+                                    .emoji(serenity::ReactionType::Unicode("👊".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Artifacts")
+                                    .value("Artifacts")
+                                    .emoji(serenity::ReactionType::Unicode("👑".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Weapons")
+                                    .value("Weapons")
+                                    .emoji(serenity::ReactionType::Unicode("⚔️".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Constellations")
+                                    .value("Constellations")
+                                    .emoji(serenity::ReactionType::Unicode("🌟".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Ascension Materials")
+                                    .value("Ascension Materials")
+                                    .emoji(serenity::ReactionType::Unicode("💸".to_owned()))
+                            })
+                            .create_option(|os| {
+                                os.label("Talent Materials")
+                                    .value("Talent Materials")
+                                    .emoji(serenity::ReactionType::Unicode("💰".to_owned()))
                             })
                         })
                     })
