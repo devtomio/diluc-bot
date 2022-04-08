@@ -1,9 +1,10 @@
-use crate::{ApplicationContext, Context, Error};
+use crate::{ApplicationContext, Error};
 use chrono::Utc;
 use mongodb::bson::{doc, Document};
+use poise::Modal;
 use std::ops::Not;
 
-#[derive(Debug, poise::Modal)]
+#[derive(Debug, Modal)]
 #[name = "Create a tag"]
 struct CreateTagModal {
     #[placeholder = "my-awesome-tag"]
@@ -19,12 +20,15 @@ struct CreateTagModal {
 #[poise::command(slash_command)]
 pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
     if ctx.interaction.guild_id().is_none() {
-        poise::send_application_reply(ctx, |r| r.content("This command is only available in guilds.")).await?;
+        poise::send_application_reply(ctx, |r| {
+            r.content("This command is only available in guilds.")
+        })
+        .await?;
 
         return Ok(());
     }
 
-    let data = <CreateTagModal as poise::Modal>::execute(ctx).await?;
+    let data = CreateTagModal::execute(ctx).await?;
     let db = ctx.data.db.database("diluc-bot");
     let collection = db.collection::<Document>("tags");
     let exists = collection
