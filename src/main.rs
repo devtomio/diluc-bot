@@ -67,7 +67,11 @@ async fn main() {
             commands::ping(),
             commands::character(),
             poise::Command {
-                subcommands: vec![commands::tag::create(), commands::tag::tag()],
+                subcommands: vec![
+                    commands::tag::create(),
+                    commands::tag::show(),
+                    commands::tag::tag(),
+                ],
                 ..commands::tag::tag()
             },
         ],

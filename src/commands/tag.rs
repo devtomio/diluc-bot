@@ -1,5 +1,6 @@
 use crate::{ApplicationContext, Context, Error};
 use chrono::Utc;
+use futures::{stream::StreamExt, Stream};
 use mongodb::bson::{doc, Document};
 use poise::Modal;
 use std::ops::Not;
@@ -15,6 +16,28 @@ struct CreateTagModal {
     #[name = "Content"]
     #[paragraph]
     content: String,
+}
+
+async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item = String> {
+    let db = ctx.data().db.database("diluc-bot");
+    let collection = db.collection::<Document>("tags");
+    let docs = vec![
+        doc! {
+            "$search": {
+                "autocomplete": {
+                    "query": partial,
+                    "path": "name",
+                    "tokenOrder": "any"
+                }
+            }
+        },
+        doc! { "$limit": 10i32 },
+        doc! { "$project": { "_id": 0i32, "name": 1i32 } },
+    ];
+
+    let results = collection.aggregate(docs, None).await.unwrap();
+
+    results.map(|d| d.unwrap().get_str("name").unwrap().to_owned())
 }
 
 #[poise::command(slash_command)]
@@ -76,6 +99,35 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
         })
         .await?;
     }
+
+    Ok(())
+}
+
+#[poise::command(slash_command)]
+pub async fn show(
+    ctx: Context<'_>,
+    #[description = "The name of the tag"]
+    #[autocomplete = "autocomplete_tag"]
+    name: String,
+) -> Result<(), Error> {
+    ctx.defer().await?;
+
+    let db = ctx.data().db.database("diluc-bot");
+    let collection = db.collection::<Document>("tags");
+    let tag = collection
+        .find_one(
+            doc! {
+                "name": name,
+                "guild_id": ctx.guild_id().unwrap().to_string()
+            },
+            None,
+        )
+        .await?;
+
+    match tag {
+        Some(t) => ctx.say(t.get_str("content")?).await?,
+        None => ctx.say("Sorry, that tag doesn't exist.").await?,
+    };
 
     Ok(())
 }
