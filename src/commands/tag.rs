@@ -24,8 +24,13 @@ async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item
     let docs = vec![
         doc! {
             "$search": {
+                "index": "default",
                 "autocomplete": {
-                    "query": partial,
+                    "query": match partial.len() {
+                        // Special character because mongo autocomplete doesn't support empty strings
+                        0 => "「",
+                        _ => &partial
+                    },
                     "path": "name",
                     "tokenOrder": "any"
                 }
