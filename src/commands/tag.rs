@@ -16,19 +16,14 @@ struct CreateTagModal {
     content: String,
 }
 
-async fn check_if_in_guild(ctx: Context<'_>) -> Result<bool, Error> {
-    match ctx.guild_id() {
-        Some(_) => Ok(true),
-        None => {
-            ctx.say("This command is only available in guilds.").await?;
-
-            Ok(false)
-        }
-    }
-}
-
-#[poise::command(slash_command, check = "check_if_in_guild")]
+#[poise::command(slash_command)]
 pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
+    if ctx.interaction.guild_id().is_none() {
+        poise::send_application_reply(ctx, |r| r.content("This command is only available in guilds.")).await?;
+
+        return Ok(());
+    }
+
     let data = <CreateTagModal as poise::Modal>::execute(ctx).await?;
     let db = ctx.data.db.database("diluc-bot");
     let collection = db.collection::<Document>("tags");
