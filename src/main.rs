@@ -1,6 +1,10 @@
 #[macro_use]
 extern crate tracing;
 
+use mongodb::{
+    options::{ClientOptions, ResolverConfig},
+    Client as MongoClient,
+};
 use redis::{Client, Script};
 use std::{env::var, fs::read_to_string};
 use tracing::Level;
@@ -11,9 +15,11 @@ pub mod data;
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
+pub type ApplicationContext<'a> = poise::ApplicationContext<'a, Data, Error>;
 
 #[allow(dead_code)]
 pub struct Data {
+    db: MongoClient,
     redis: Client,
     redis_fuzzy: Script,
 }
@@ -40,10 +46,31 @@ async fn main() {
 
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
+    #[cfg(target_os = "windows")]
+    let mongo_options = ClientOptions::parse_with_resolver_config(
+        var("MONGO_URL").unwrap(),
+        ResolverConfig::cloudflare(),
+    )
+    .await
+    .unwrap();
+
+    #[cfg(not(target_os = "windows"))]
+    let mongo_options = ClientOptions::parse(var("MONGO_URL").unwrap())
+        .await
+        .unwrap();
+
+    let mongo = MongoClient::with_options(mongo_options).unwrap();
     let redis = Client::open(var("REDIS_URL").unwrap()).unwrap();
     let lua_script = read_to_string("redis/fuzzySearch.lua").unwrap();
     let options = poise::FrameworkOptions {
-        commands: vec![commands::ping(), commands::character()],
+        commands: vec![
+            commands::ping(),
+            commands::character(),
+            poise::Command {
+                subcommands: vec![commands::tag::create()],
+                ..commands::tag::create()
+            },
+        ],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: None,
             mention_as_prefix: true,
@@ -69,6 +96,7 @@ async fn main() {
             Box::pin(async move {
                 Ok(Data {
                     redis,
+                    db: mongo,
                     redis_fuzzy: Script::new(&lua_script),
                 })
             })
