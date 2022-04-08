@@ -1,4 +1,4 @@
-use crate::{ApplicationContext, Error};
+use crate::{ApplicationContext, Context, Error};
 use chrono::Utc;
 use mongodb::bson::{doc, Document};
 use poise::Modal;
@@ -58,7 +58,7 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
             .insert_one(
                 doc! {
                     "name": &data.name,
-                    "content": data.content,
+                    "content": &data.content,
                     "guild_id": ctx.interaction.guild_id().unwrap().to_string(),
                     "owner_id": ctx.interaction.user().id.to_string(),
                     "owner_tag": ctx.interaction.user().tag(),
@@ -77,5 +77,11 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
         .await?;
     }
 
+    Ok(())
+}
+
+/// No-op function because of how poise subcommands are designed
+#[poise::command(slash_command)]
+pub async fn tag(_ctx: Context<'_>) -> Result<(), Error> {
     Ok(())
 }

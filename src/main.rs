@@ -1,10 +1,10 @@
 #[macro_use]
 extern crate tracing;
 
-use mongodb::{
-    options::{ClientOptions, ResolverConfig},
-    Client as MongoClient,
-};
+#[cfg(target_os = "windows")]
+use mongodb::options::ResolverConfig;
+
+use mongodb::{options::ClientOptions, Client as MongoClient};
 use redis::{Client, Script};
 use std::{env::var, fs::read_to_string};
 use tracing::Level;
@@ -67,8 +67,8 @@ async fn main() {
             commands::ping(),
             commands::character(),
             poise::Command {
-                subcommands: vec![commands::tag::create()],
-                ..commands::tag::create()
+                subcommands: vec![commands::tag::create(), commands::tag::tag()],
+                ..commands::tag::tag()
             },
         ],
         prefix_options: poise::PrefixFrameworkOptions {
