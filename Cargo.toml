@@ -22,7 +22,12 @@ num-format = "0.4.0"
 strum = "0.24.0"
 strum_macros = "0.24.0"
 chrono = "0.4.19"
+rayon = "1.5.1"
+dashmap = "5.2.0"
 
 [profile.release]
 lto = true
-incremental = true
+
+[patch."https://github.com/serenity-rs/serenity".serenity]
+git = "https://github.com/devtomio/serenity"
+branch = "next"

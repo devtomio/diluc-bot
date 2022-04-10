@@ -12,6 +12,7 @@ use tracing_subscriber::FmtSubscriber;
 
 mod commands;
 pub mod data;
+pub mod util;
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
@@ -70,6 +71,8 @@ async fn main() {
                 subcommands: vec![
                     commands::tag::create(),
                     commands::tag::show(),
+                    commands::tag::delete(),
+                    commands::tag::edit(),
                     commands::tag::tag(),
                 ],
                 ..commands::tag::tag()

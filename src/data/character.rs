@@ -130,7 +130,7 @@ pub const CHARACTER_LIST: &[&str] = &["Diluc"];
 
 pub struct Info {
     pub personality: String,
-    pub color: (u8, u8, u8),
+    pub colour: (u8, u8, u8),
     pub rawname: String,
     pub image: String,
     pub element: Element,
@@ -139,7 +139,7 @@ pub struct Info {
 pub fn get_additional_info(name: Character) -> Info {
     match name {
         Character::Diluc => Info {
-            color: (217, 65, 33),
+            colour: (217, 65, 33),
             rawname: "diluc".to_owned(),
             element: Element::Pyro,
             image: "https://static.wikia.nocookie.net/gensin-impact/images/0/02/Character_Diluc_Thumb.png".to_owned(),

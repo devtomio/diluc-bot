@@ -12,6 +12,7 @@ use fuse_rust::Fuse;
 use futures::{Stream, StreamExt};
 use num_format::{Buffer, Locale};
 use poise::serenity_prelude as serenity;
+use rayon::prelude::*;
 use std::{str::FromStr, time::Duration};
 
 fn format_number(n: &i64) -> String {
@@ -59,7 +60,7 @@ pub async fn character(
         .field("Weapon", info.weapontype, true)
         .field("Affiliation", info.affiliation, true)
         .field("Title", info.title, true)
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image);
 
     let mut pg2 = serenity::CreateEmbed::default();
@@ -69,7 +70,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(additional_info.personality);
 
@@ -148,7 +149,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(talent_text);
 
@@ -202,7 +203,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(artifact_text);
 
@@ -224,7 +225,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(weapon_text);
 
@@ -268,7 +269,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(constellation_text);
 
@@ -284,37 +285,37 @@ pub async fn character(
     ",
         info.costs
             .ascend1
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         info.costs
             .ascend2
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         info.costs
             .ascend3
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         info.costs
             .ascend4
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         info.costs
             .ascend5
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         info.costs
             .ascend6
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", ")
@@ -325,7 +326,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(ascension_materials_text);
 
@@ -345,63 +346,63 @@ pub async fn character(
         talents
             .costs
             .lvl2
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl3
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl4
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl5
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl6
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl7
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl8
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl9
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", "),
         talents
             .costs
             .lvl10
-            .iter()
+            .par_iter()
             .map(|c| format!("{} {}", format_number(&c.count), c.name))
             .collect::<Vec<_>>()
             .join(", ")
@@ -412,7 +413,7 @@ pub async fn character(
             a.name(format!("{} | {}★", info.name, info.rarity))
                 .icon_url(&additional_info.element)
         })
-        .color(additional_info.color)
+        .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
         .description(talent_materials_text);
 

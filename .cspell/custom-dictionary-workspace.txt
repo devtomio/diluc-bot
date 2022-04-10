@@ -9,6 +9,9 @@ baseatk
 birthdaymmdd
 chongyun
 Chongyun
+colour
+Colour
+dashmap
 diona
 Diona
 effectname
@@ -19,6 +22,7 @@ kamisato
 Kamisato
 keqing
 Keqing
+mapref
 ningguang
 Ningguang
 qiqi
@@ -34,6 +38,7 @@ tartaglia
 Tartaglum
 thoma
 Thoma
+typemap
 venti
 Venti
 weaponmaterialtype
