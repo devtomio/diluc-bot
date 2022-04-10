@@ -22,7 +22,7 @@ jobs:
           override: true
 
       - name: Install cargo msrv
-        run: cargo install cargo-msrv
+        run: cargo install cargo-msrv --no-default-features
 
       - name: Find the MSRV
         run: cargo msrv

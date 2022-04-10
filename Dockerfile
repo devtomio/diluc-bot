@@ -1,4 +1,4 @@
-FROM rustlang/rust:nightly-bullseye-slim as base
+FROM rust:slim-bullseye as base
 
 WORKDIR /usr/src/app
 
