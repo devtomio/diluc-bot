@@ -2,7 +2,7 @@ use crate::{util::get_member, ApplicationContext, Context, Error};
 use chrono::{DateTime, NaiveDateTime, Utc};
 use futures::{stream::StreamExt, Stream};
 use mongodb::bson::{doc, Document};
-use poise::{Modal, serenity_prelude as serenity};
+use poise::{serenity_prelude as serenity, Modal};
 use std::ops::Not;
 
 async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item = String> {
