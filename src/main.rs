@@ -73,6 +73,7 @@ async fn main() {
                     commands::tag::show(),
                     commands::tag::delete(),
                     commands::tag::edit(),
+                    commands::tag::info(),
                     commands::tag::tag(),
                 ],
                 ..commands::tag::tag()
