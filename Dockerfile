@@ -36,4 +36,6 @@ FROM base as runner
 COPY --from=builder /usr/src/app/target/release/diluc-bot /usr/local/bin/diluc-bot
 COPY --from=builder /usr/src/app/start.sh .
 
+RUN chmod +x ./start.sh
+
 CMD ["./start.sh"]
