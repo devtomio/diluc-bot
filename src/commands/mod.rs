@@ -1,4 +1,5 @@
 pub mod character;
+pub mod exec;
 pub mod ping;
 pub mod tag;
 

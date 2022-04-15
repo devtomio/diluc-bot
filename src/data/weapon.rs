@@ -88,26 +88,17 @@ pub async fn get_weapon(name: &str, redis: &Client) -> Weapon {
             let val: Weapon = from_str(&raw).unwrap();
 
             val
-        }
+        },
         None => {
             let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/weapons/{name}.json");
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<Weapon>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<Weapon>().await.unwrap();
 
             let _: String = con
-                .set_ex(
-                    format!("{name}-weapon"),
-                    to_string::<Weapon>(&json).unwrap(),
-                    604800,
-                )
+                .set_ex(format!("{name}-weapon"), to_string::<Weapon>(&json).unwrap(), 604800)
                 .await
                 .unwrap();
 
             json
-        }
+        },
     }
 }

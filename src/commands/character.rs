@@ -1,19 +1,24 @@
-use crate::{
-    data::{
-        artifact::get_artifact,
-        character::{get_additional_info, get_build_info, get_info, Character, CHARACTER_LIST},
-        constellation::get_constellation,
-        talent::get_talent,
-        weapon::get_weapon,
-    },
-    Context, Error,
-};
+use std::str::FromStr;
+use std::time::Duration;
+
 use fuse_rust::Fuse;
 use futures::{Stream, StreamExt};
 use num_format::{Buffer, Locale};
 use poise::serenity_prelude as serenity;
 use rayon::prelude::*;
-use std::{str::FromStr, time::Duration};
+
+use crate::data::artifact::get_artifact;
+use crate::data::character::{
+    get_additional_info,
+    get_build_info,
+    get_info,
+    Character,
+    CHARACTER_LIST,
+};
+use crate::data::constellation::get_constellation;
+use crate::data::talent::get_talent;
+use crate::data::weapon::get_weapon;
+use crate::{Context, Result};
 
 fn format_number(n: &i64) -> String {
     let mut buf = Buffer::default();
@@ -36,7 +41,7 @@ pub async fn character(
     #[description = "The name of the character"]
     #[autocomplete = "autocomplete_character"]
     name: String,
-) -> Result<(), Error> {
+) -> Result<()> {
     ctx.defer().await?;
 
     let data = ctx.data();
@@ -50,8 +55,7 @@ pub async fn character(
 
     pg1.title("General Information")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .description(info.description)
         .field("Gender", info.gender, true)
@@ -67,8 +71,7 @@ pub async fn character(
 
     pg2.title("Personality")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -146,8 +149,7 @@ pub async fn character(
 
     pg3.title("Talents")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -185,23 +187,18 @@ pub async fn character(
         if recommended_artifact.set_2.is_none() {
             artifact_text.push_str(&format!("__4pc {}__\n", set1_info.name));
         } else {
-            let set2_info = get_artifact(
-                recommended_artifact.set_2.unwrap().replace('_', ""),
-                &data.redis,
-            )
-            .await;
+            let set2_info =
+                get_artifact(recommended_artifact.set_2.unwrap().replace('_', ""), &data.redis)
+                    .await;
 
-            artifact_text.push_str(&format!(
-                "__2pc {} & 2pc {}__\n",
-                set1_info.name, set2_info.name
-            ));
+            artifact_text
+                .push_str(&format!("__2pc {} & 2pc {}__\n", set1_info.name, set2_info.name));
         }
     }
 
     pg4.title("Artifacts")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -214,16 +211,13 @@ pub async fn character(
         let id = weapon.id.replace('_', "");
         let weapon_info = get_weapon(&id, &data.redis).await;
 
-        weapon_text.push_str(&format!(
-            "**{}**\nSub-stat: {}\n\n",
-            weapon_info.name, weapon_info.substat
-        ));
+        weapon_text
+            .push_str(&format!("**{}**\nSub-stat: {}\n\n", weapon_info.name, weapon_info.substat));
     }
 
     pg5.title("Weapons")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -266,8 +260,7 @@ pub async fn character(
 
     pg6.title("Constellations")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -323,8 +316,7 @@ pub async fn character(
 
     pg7.title("Ascension Materials")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -410,8 +402,7 @@ pub async fn character(
 
     pg8.title("Talent Materials")
         .author(|a| {
-            a.name(format!("{} | {}★", info.name, info.rarity))
-                .icon_url(&additional_info.element)
+            a.name(format!("{} | {}★", info.name, info.rarity)).icon_url(&additional_info.element)
         })
         .colour(additional_info.colour)
         .thumbnail(&additional_info.image)
@@ -435,12 +426,7 @@ pub async fn character(
                 *e = pg1.clone();
 
                 e.footer(|f| {
-                    f.text(format!(
-                        "{} | {}/{}",
-                        info.constellation,
-                        index + 1,
-                        pages.len()
-                    ))
+                    f.text(format!("{} | {}/{}", info.constellation, index + 1, pages.len()))
                 });
 
                 e
@@ -555,7 +541,7 @@ pub async fn character(
                     .await?;
 
                 break;
-            }
+            },
         };
 
         interaction.defer(ctx.discord()).await?;
@@ -586,7 +572,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Personality" => {
                         index = 2;
 
@@ -608,7 +594,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Talents" => {
                         index = 3;
 
@@ -630,7 +616,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Artifacts" => {
                         index = 4;
 
@@ -652,7 +638,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Weapons" => {
                         index = 5;
 
@@ -674,7 +660,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Constellations" => {
                         index = 6;
 
@@ -696,7 +682,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Ascension Materials" => {
                         index = 7;
 
@@ -718,7 +704,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     "Talent Materials" => {
                         index = 8;
 
@@ -740,7 +726,7 @@ pub async fn character(
                                 })
                             })
                             .await?
-                    }
+                    },
                     _ => unreachable!(),
                 },
                 _ => unreachable!(),
@@ -767,7 +753,7 @@ pub async fn character(
                             })
                         })
                         .await?;
-                }
+                },
                 "previous_page" => {
                     if index == 0 {
                         index = pages.len() - 1;
@@ -793,7 +779,7 @@ pub async fn character(
                             })
                         })
                         .await?;
-                }
+                },
                 "next_page" => {
                     if index == pages.len() - 1 {
                         index = 0
@@ -819,7 +805,7 @@ pub async fn character(
                             })
                         })
                         .await?;
-                }
+                },
                 "last_page" => {
                     index = pages.len() - 1;
 
@@ -841,7 +827,7 @@ pub async fn character(
                             })
                         })
                         .await?;
-                }
+                },
                 "stop" => {
                     message
                         .edit(ctx.discord(), |m| {
@@ -862,7 +848,7 @@ pub async fn character(
                             .components(|c| c)
                         })
                         .await?;
-                }
+                },
                 _ => unreachable!(),
             },
             _ => unreachable!(),

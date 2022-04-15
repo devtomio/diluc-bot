@@ -1,10 +1,13 @@
-use crate::{Context, Error};
-use libm::round;
-use poise::serenity_prelude as serenity;
 use std::time::Duration;
 
+use libm::round;
+use poise::serenity_prelude as serenity;
+
+use crate::{Context, Result};
+
+/// Shows the latency of the bot in milliseconds.
 #[poise::command(slash_command)]
-pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
+pub async fn ping(ctx: Context<'_>) -> Result<()> {
     let shard_manager = ctx.framework().shard_manager();
     let manager = shard_manager.lock().await;
     let runners = manager.runners.lock().await;
@@ -14,12 +17,7 @@ pub async fn ping(ctx: Context<'_>) -> Result<(), Error> {
 
     ctx.say(format!(
         "🏓 Pong! The ping is `{}ms`",
-        round(
-            runner
-                .latency
-                .unwrap_or_else(|| Duration::from_millis(90))
-                .as_millis() as f64
-        )
+        round(runner.latency.unwrap_or_else(|| Duration::from_millis(75)).as_millis() as f64)
     ))
     .await?;
 

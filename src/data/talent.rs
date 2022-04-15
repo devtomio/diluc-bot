@@ -187,26 +187,17 @@ pub async fn get_talent(name: &str, redis: &Client) -> Talent {
             let val: Talent = from_str(&raw).unwrap();
 
             val
-        }
+        },
         None => {
             let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/talents/{name}.json");
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<Talent>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<Talent>().await.unwrap();
 
             let _: String = con
-                .set_ex(
-                    format!("{name}-talents"),
-                    to_string::<Talent>(&json).unwrap(),
-                    604800,
-                )
+                .set_ex(format!("{name}-talents"), to_string::<Talent>(&json).unwrap(), 604800)
                 .await
                 .unwrap();
 
             json
-        }
+        },
     }
 }

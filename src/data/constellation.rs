@@ -68,15 +68,10 @@ pub async fn get_constellation(name: &str, redis: &Client) -> Constellation {
             let val: Constellation = from_str(&raw).unwrap();
 
             val
-        }
+        },
         None => {
             let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/constellations/{name}.json");
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<Constellation>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<Constellation>().await.unwrap();
 
             let _: String = con
                 .set_ex(
@@ -88,6 +83,6 @@ pub async fn get_constellation(name: &str, redis: &Client) -> Constellation {
                 .unwrap();
 
             json
-        }
+        },
     }
 }

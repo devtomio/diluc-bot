@@ -1,9 +1,13 @@
-use crate::{util::get_member, ApplicationContext, Context, Error};
+use std::ops::Not;
+
 use chrono::{DateTime, NaiveDateTime, Utc};
-use futures::{stream::StreamExt, Stream};
+use futures::stream::StreamExt;
+use futures::Stream;
 use mongodb::bson::{doc, Document};
 use poise::{serenity_prelude as serenity, Modal};
-use std::ops::Not;
+
+use crate::util::get_member;
+use crate::{ApplicationContext, Context, Result};
 
 async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item = String> {
     let db = ctx.data().db.database("diluc-bot");
@@ -23,8 +27,8 @@ async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item
                 }
             }
         },
-        doc! { "$limit": 10_i32 },
-        doc! { "$project": { "_id": 0_i32, "name": 1_i32 } },
+        doc! { "$limit": 10 },
+        doc! { "$project": { "_id": 0, "name": 1 } },
     ];
 
     let results = collection.aggregate(docs, None).await.unwrap();
@@ -45,8 +49,9 @@ struct CreateTagModal {
     content: String,
 }
 
+/// Create a new tag.
 #[poise::command(slash_command, guild_only)]
-pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
+pub async fn create(ctx: ApplicationContext<'_>) -> Result<()> {
     let data = CreateTagModal::execute(ctx).await?;
     let db = ctx.data.db.database("diluc-bot");
     let collection = db.collection::<Document>("tags");
@@ -63,11 +68,8 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
 
     if exists {
         poise::send_application_reply(ctx, |r| {
-            r.content(format!(
-                "The tag \"{}\" already exists in this guild.",
-                &data.name
-            ))
-            .ephemeral(true)
+            r.content(format!("The tag \"{}\" already exists in this guild.", &data.name))
+                .ephemeral(true)
         })
         .await?;
     } else {
@@ -88,10 +90,7 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
             .await?;
 
         poise::send_application_reply(ctx, |r| {
-            r.content(format!(
-                "The tag \"{}\" was created successfully!",
-                &data.name
-            ))
+            r.content(format!("The tag \"{}\" was created successfully!", &data.name))
         })
         .await?;
     }
@@ -99,13 +98,14 @@ pub async fn create(ctx: ApplicationContext<'_>) -> Result<(), Error> {
     Ok(())
 }
 
+/// Show the content of a tag.
 #[poise::command(slash_command, guild_only)]
 pub async fn show(
     ctx: Context<'_>,
     #[description = "The name of the tag"]
     #[autocomplete = "autocomplete_tag"]
     name: String,
-) -> Result<(), Error> {
+) -> Result<()> {
     ctx.defer().await?;
 
     let db = ctx.data().db.database("diluc-bot");
@@ -128,13 +128,14 @@ pub async fn show(
     Ok(())
 }
 
+/// Delete a tag.
 #[poise::command(slash_command, guild_only)]
 pub async fn delete(
     ctx: Context<'_>,
     #[description = "The name of the tag"]
     #[autocomplete = "autocomplete_tag"]
     name: String,
-) -> Result<(), Error> {
+) -> Result<()> {
     ctx.defer().await?;
 
     let db = ctx.data().db.database("diluc-bot");
@@ -154,22 +155,18 @@ pub async fn delete(
             let member =
                 get_member(ctx, ctx.guild_id().unwrap(), t.get_i64("owner_id")? as u64).await?;
 
-            if ctx.author().id != member.user.id || member.permissions.unwrap().manage_guild().not()
+            if ctx.author().id != member.user.id
+                || member.permissions.unwrap().moderate_members().not()
             {
-                ctx.say("You don't have enough permissions to delete this tag.")
-                    .await?;
+                ctx.say("You don't have enough permissions to delete this tag.").await?;
 
                 return Ok(());
             }
 
             collection.delete_one(t.clone(), None).await?;
 
-            ctx.say(format!(
-                "The tag \"{}\" was deleted successfully!",
-                t.get_str("name")?
-            ))
-            .await?
-        }
+            ctx.say(format!("The tag \"{}\" was deleted successfully!", t.get_str("name")?)).await?
+        },
         None => ctx.say("Sorry, that tag doesn't exist.").await?,
     };
 
@@ -185,13 +182,14 @@ struct EditTagModal {
     content: String,
 }
 
+/// Edit an existing tag.
 #[poise::command(slash_command, guild_only)]
 pub async fn edit(
     ctx: ApplicationContext<'_>,
     #[description = "The name of the tag"]
     #[autocomplete = "autocomplete_tag"]
     name: String,
-) -> Result<(), Error> {
+) -> Result<()> {
     let data = EditTagModal::execute(ctx).await?;
     let db = ctx.data.db.database("diluc-bot");
     let collection = db.collection::<Document>("tags");
@@ -215,11 +213,10 @@ pub async fn edit(
             .await?;
 
             if ctx.interaction.user().id != member.user.id
-                || member.permissions.unwrap().manage_guild().not()
+                || member.permissions.unwrap().moderate_members().not()
             {
                 poise::send_application_reply(ctx, |m| {
-                    m.content("You don't have enough permissions to edit this tag.")
-                        .ephemeral(true)
+                    m.content("You don't have enough permissions to edit this tag.").ephemeral(true)
                 })
                 .await?;
 
@@ -245,25 +242,26 @@ pub async fn edit(
                 ))
             })
             .await?
-        }
+        },
         None => {
             poise::send_application_reply(ctx, |m| {
                 m.content("Sorry, that tag doesn't exist.").ephemeral(true)
             })
             .await?
-        }
+        },
     };
 
     Ok(())
 }
 
+/// Shows information about a tag.
 #[poise::command(slash_command, guild_only)]
 pub async fn info(
     ctx: Context<'_>,
     #[description = "The name of the tag"]
     #[autocomplete = "autocomplete_tag"]
     name: String,
-) -> Result<(), Error> {
+) -> Result<()> {
     ctx.defer().await?;
 
     let db = ctx.data().db.database("diluc-bot");
@@ -293,7 +291,7 @@ pub async fn info(
                 })
             })
             .await?
-        }
+        },
         None => ctx.say("Sorry, that tag doesn't exist.").await?,
     };
 
@@ -302,6 +300,6 @@ pub async fn info(
 
 /// No-op function because of how poise subcommands are designed
 #[poise::command(slash_command, guild_only)]
-pub async fn tag(_ctx: Context<'_>) -> Result<(), Error> {
+pub async fn tag(_ctx: Context<'_>) -> Result<()> {
     Ok(())
 }

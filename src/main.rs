@@ -1,12 +1,15 @@
 #[macro_use]
 extern crate tracing;
 
+use std::env::var;
+use std::sync::Arc;
+
+use mongodb::options::ClientOptions;
 #[cfg(target_os = "windows")]
 use mongodb::options::ResolverConfig;
-
-use mongodb::{options::ClientOptions, Client as MongoClient};
-use redis::{Client, Script};
-use std::{env::var, fs::read_to_string};
+use mongodb::Client as MongoClient;
+use poise::serenity_prelude as serenity;
+use redis::Client;
 use tracing::Level;
 use tracing_subscriber::FmtSubscriber;
 
@@ -15,35 +18,39 @@ pub mod data;
 pub mod util;
 
 pub type Error = Box<dyn std::error::Error + Send + Sync>;
+pub type Result<T, E = Error> = anyhow::Result<T, E>;
 pub type Context<'a> = poise::Context<'a, Data, Error>;
 pub type ApplicationContext<'a> = poise::ApplicationContext<'a, Data, Error>;
 
-#[allow(dead_code)]
+#[derive(Debug)]
 pub struct Data {
-    db: MongoClient,
-    redis: Client,
-    redis_fuzzy: Script,
+    db: Arc<MongoClient>,
+    redis: Arc<Client>,
 }
 
+#[tracing::instrument]
 async fn on_error(error: poise::FrameworkError<'_, Data, Error>) {
     match error {
-        poise::FrameworkError::Setup { error } => panic!("Failed to start bot: {:?}", error),
-        poise::FrameworkError::Command { error, ctx } => {
+        poise::FrameworkError::Setup {
+            error,
+        } => panic!("Failed to start bot: {:?}", error),
+        poise::FrameworkError::Command {
+            error,
+            ctx,
+        } => {
             error!("Error in command `{}`: {:?}", ctx.command().name, error,);
-        }
+        },
         error => {
             if let Err(e) = poise::builtins::on_error(error).await {
                 error!("Error while handling error: {}", e)
             }
-        }
+        },
     }
 }
 
 #[tokio::main]
 async fn main() {
-    let subscriber = FmtSubscriber::builder()
-        .with_max_level(Level::INFO)
-        .finish();
+    let subscriber = FmtSubscriber::builder().with_max_level(Level::INFO).finish();
 
     tracing::subscriber::set_global_default(subscriber).unwrap();
 
@@ -56,29 +63,21 @@ async fn main() {
     .unwrap();
 
     #[cfg(not(target_os = "windows"))]
-    let mongo_options = ClientOptions::parse(var("MONGO_URL").unwrap())
-        .await
-        .unwrap();
+    let mongo_options = ClientOptions::parse(var("MONGO_URL").unwrap()).await.unwrap();
 
     let mongo = MongoClient::with_options(mongo_options).unwrap();
     let redis = Client::open(var("REDIS_URL").unwrap()).unwrap();
-    let lua_script = read_to_string("redis/fuzzySearch.lua").unwrap();
     let options = poise::FrameworkOptions {
-        commands: vec![
-            commands::ping(),
-            commands::character(),
-            poise::Command {
-                subcommands: vec![
-                    commands::tag::create(),
-                    commands::tag::show(),
-                    commands::tag::delete(),
-                    commands::tag::edit(),
-                    commands::tag::info(),
-                    commands::tag::tag(),
-                ],
-                ..commands::tag::tag()
-            },
-        ],
+        commands: vec![commands::ping(), commands::character(), poise::Command {
+            subcommands: vec![
+                commands::tag::create(),
+                commands::tag::show(),
+                commands::tag::delete(),
+                commands::tag::edit(),
+                commands::tag::info(),
+            ],
+            ..commands::tag::tag()
+        }],
         prefix_options: poise::PrefixFrameworkOptions {
             prefix: None,
             mention_as_prefix: true,
@@ -98,19 +97,68 @@ async fn main() {
         ..Default::default()
     };
 
-    poise::Framework::build()
+    let framework = poise::Framework::build()
         .token(var("DISCORD_TOKEN").unwrap())
-        .user_data_setup(move |_ctx, _ready, _framework| {
+        .user_data_setup(move |ctx, _ready, framework| {
             Box::pin(async move {
+                let commands = &framework.options().commands;
+                let commands_builder = poise::builtins::create_application_commands(commands);
+
+                serenity::ApplicationCommand::set_global_application_commands(&ctx.http, |b| {
+                    *b = commands_builder;
+
+                    b
+                })
+                .await?;
+
                 Ok(Data {
-                    redis,
-                    db: mongo,
-                    redis_fuzzy: Script::new(&lua_script),
+                    redis: Arc::new(redis),
+                    db: Arc::new(mongo),
                 })
             })
         })
         .options(options)
-        .run()
+        .build()
         .await
-        .unwrap()
+        .unwrap();
+
+    let framework_2 = framework.clone();
+
+    // Ctrl-C handler
+    tokio::spawn(async move {
+        #[cfg(unix)]
+        {
+            use tokio::signal::unix as signal;
+
+            let [mut s1, mut s2, mut s3] = [
+                signal::signal(signal::SignalKind::hangup()).unwrap(),
+                signal::signal(signal::SignalKind::interrupt()).unwrap(),
+                signal::signal(signal::SignalKind::terminate()).unwrap(),
+            ];
+
+            tokio::select!(
+                v = s1.recv() => v.unwrap(),
+                v = s2.recv() => v.unwrap(),
+                v = s3.recv() => v.unwrap(),
+            );
+        }
+
+        #[cfg(windows)]
+        {
+            let (mut s1, mut s2) = (
+                tokio::signal::windows::ctrl_c().unwrap(),
+                tokio::signal::windows::ctrl_break().unwrap(),
+            );
+
+            tokio::select!(
+                v = s1.recv() => v.unwrap(),
+                v = s2.recv() => v.unwrap(),
+            );
+        }
+
+        warn!("Received Ctrl-C and will be shutting down.");
+        framework_2.shard_manager().lock().await.shutdown_all().await;
+    });
+
+    framework.start().await.unwrap();
 }

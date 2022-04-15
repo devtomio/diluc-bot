@@ -1,7 +1,9 @@
+use std::ops::Index;
+use std::str::FromStr;
+
 use redis::{AsyncCommands, Client};
 use serde::{Deserialize, Serialize};
 use serde_json::{from_str, to_string};
-use std::{ops::Index, str::FromStr};
 use strum_macros::Display;
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
@@ -166,23 +168,16 @@ pub async fn get_info(name: &str, redis: &Client) -> CharacterInfo {
             let val: CharacterInfo = from_str(&raw).unwrap();
 
             val
-        }
+        },
         None => {
             let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/characters/{name}.json");
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<CharacterInfo>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<CharacterInfo>().await.unwrap();
 
-            let _: String = con
-                .set_ex(name, to_string::<CharacterInfo>(&json).unwrap(), 604800)
-                .await
-                .unwrap();
+            let _: String =
+                con.set_ex(name, to_string::<CharacterInfo>(&json).unwrap(), 604800).await.unwrap();
 
             json
-        }
+        },
     }
 }
 
@@ -199,29 +194,20 @@ pub async fn get_build_info(name: &str, redis: &Client) -> Build {
             let build: &Vec<Build> = &val[name];
 
             build.get(0).unwrap().to_owned()
-        }
+        },
         None => {
             let url = "https://raw.githubusercontent.com/dvaJi/genshin-builds/18df6fb6dfc1397151549c27a740b83137a31d88/_content/data/builds.json";
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<OtherInfo>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<OtherInfo>().await.unwrap();
 
             let _: String = con
-                .set_ex(
-                    "character_build_info",
-                    to_string::<OtherInfo>(&json).unwrap(),
-                    604800,
-                )
+                .set_ex("character_build_info", to_string::<OtherInfo>(&json).unwrap(), 604800)
                 .await
                 .unwrap();
 
             let build: &Vec<Build> = &json[name];
 
             build.get(0).unwrap().to_owned()
-        }
+        },
     }
 }
 

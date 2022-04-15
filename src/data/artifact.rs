@@ -72,26 +72,17 @@ pub async fn get_artifact(name: String, redis: &Client) -> Artifact {
             let val: Artifact = from_str(&raw).unwrap();
 
             val
-        }
+        },
         None => {
             let url = format!("https://raw.githubusercontent.com/theBowja/genshin-db/main/src/data/English/artifacts/{name}.json");
-            let json = reqwest::get(url)
-                .await
-                .unwrap()
-                .json::<Artifact>()
-                .await
-                .unwrap();
+            let json = reqwest::get(url).await.unwrap().json::<Artifact>().await.unwrap();
 
             let _: String = con
-                .set_ex(
-                    format!("{name}-artifact"),
-                    to_string::<Artifact>(&json).unwrap(),
-                    604800,
-                )
+                .set_ex(format!("{name}-artifact"), to_string::<Artifact>(&json).unwrap(), 604800)
                 .await
                 .unwrap();
 
             json
-        }
+        },
     }
 }
