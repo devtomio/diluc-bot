@@ -165,7 +165,8 @@ pub async fn delete(
     match tag {
         Some(t) => {
             let member =
-                get_member(ctx, ctx.guild_id().unwrap(), t.get_i64("owner_id")? as u64).await?;
+                get_member(ctx, ctx.guild_id().unwrap(), t.get_str("owner_id")?.parse::<u64>()?)
+                    .await?;
 
             if ctx.author().id != member.user.id
                 || member.permissions.unwrap().moderate_members().not()
@@ -220,7 +221,7 @@ pub async fn edit(
             let member = get_member(
                 poise::Context::Application(ctx),
                 ctx.interaction.guild_id().unwrap(),
-                t.get_i64("owner_id")? as u64,
+                t.get_str("owner_id")?.parse::<u64>().unwrap(),
             )
             .await?;
 
@@ -291,7 +292,8 @@ pub async fn info(
     match tag {
         Some(t) => {
             let member =
-                get_member(ctx, ctx.guild_id().unwrap(), t.get_i64("owner_id")? as u64).await?;
+                get_member(ctx, ctx.guild_id().unwrap(), t.get_str("owner_id")?.parse::<u64>()?)
+                    .await?;
 
             ctx.send(|m| {
                 m.embed(|e| {
@@ -299,7 +301,10 @@ pub async fn info(
                         .thumbnail(member.user.face())
                         .description(t.get_str("content").unwrap())
                         .timestamp(DateTime::<Utc>::from_utc(
-                            NaiveDateTime::from_timestamp(t.get_i64("created_at").unwrap(), 0),
+                            NaiveDateTime::from_timestamp(
+                                t.get_str("created_at").unwrap().parse::<i64>().unwrap(),
+                                0,
+                            ),
                             Utc,
                         ))
                         .colour(serenity::Colour::RED)
