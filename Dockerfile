@@ -7,10 +7,12 @@ ENV RUSTFLAGS="-C target-cpu=native"
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends build-essential python3 dumb-init lld libssl-dev pkg-config && \
+    apt-get install -y --no-install-recommends build-essential python3 dumb-init lld libssl-dev pkg-config openrc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove
+
+RUN curl -fsSL https://tailscale.com/install.sh | sh
 
 ENTRYPOINT ["dumb-init", "--"]
 
@@ -25,11 +27,13 @@ RUN mkdir src && \
     rm -r src
 
 COPY src/ src/
+COPY start.sh .
 
 RUN cargo build --release
 
 FROM base as runner
 
 COPY --from=builder /usr/src/app/target/release/diluc-bot /usr/local/bin/diluc-bot
+COPY --from=builder /usr/src/app/start.sh .
 
-ENTRYPOINT ["/usr/local/bin/diluc-bot"]
+CMD ["./start.sh"]
