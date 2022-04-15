@@ -290,10 +290,13 @@ pub async fn info(
 
     match tag {
         Some(t) => {
+            let member =
+                get_member(ctx, ctx.guild_id().unwrap(), t.get_i64("owner_id")? as u64).await?;
+
             ctx.send(|m| {
                 m.embed(|e| {
                     e.title(format!("**Tag __{}__**", t.get_str("name").unwrap()))
-                        .thumbnail(ctx.author().face())
+                        .thumbnail(member.user.face())
                         .description(t.get_str("content").unwrap())
                         .timestamp(DateTime::<Utc>::from_utc(
                             NaiveDateTime::from_timestamp(t.get_i64("created_at").unwrap(), 0),
