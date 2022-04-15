@@ -27,8 +27,20 @@ async fn autocomplete_tag(ctx: Context<'_>, partial: String) -> impl Stream<Item
                 }
             }
         },
-        doc! { "$limit": 10 },
-        doc! { "$project": { "_id": 0, "name": 1 } },
+        doc! {
+            "$match": {
+                "guild_id": ctx.guild_id().unwrap().to_string()
+            }
+        },
+        doc! {
+            "$limit": 10
+        },
+        doc! {
+            "$project": {
+                "_id": 0,
+                "name": 1
+            }
+        },
     ];
 
     let results = collection.aggregate(docs, None).await.unwrap();

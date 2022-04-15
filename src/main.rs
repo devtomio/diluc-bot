@@ -68,7 +68,7 @@ async fn main() {
     let mongo = MongoClient::with_options(mongo_options).unwrap();
     let redis = Client::open(var("REDIS_URL").unwrap()).unwrap();
     let options = poise::FrameworkOptions {
-        commands: vec![commands::ping(), commands::character(), poise::Command {
+        commands: vec![commands::ping(), commands::character(), commands::exec(), poise::Command {
             subcommands: vec![
                 commands::tag::create(),
                 commands::tag::show(),
