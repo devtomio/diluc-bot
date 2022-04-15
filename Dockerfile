@@ -7,7 +7,7 @@ ENV RUSTFLAGS="-C target-cpu=native"
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
-    apt-get install -y --no-install-recommends build-essential python3 dumb-init lld libssl-dev pkg-config openrc && \
+    apt-get install -y --no-install-recommends build-essential python3 curl dumb-init lld libssl-dev pkg-config openrc && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* && \
     apt-get autoremove
