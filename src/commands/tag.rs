@@ -301,10 +301,7 @@ pub async fn info(
                         .thumbnail(member.user.face())
                         .description(t.get_str("content").unwrap())
                         .timestamp(DateTime::<Utc>::from_utc(
-                            NaiveDateTime::from_timestamp(
-                                t.get_str("created_at").unwrap().parse::<i64>().unwrap(),
-                                0,
-                            ),
+                            NaiveDateTime::from_timestamp(t.get_i64("created_at").unwrap(), 0),
                             Utc,
                         ))
                         .colour(serenity::Colour::RED)
