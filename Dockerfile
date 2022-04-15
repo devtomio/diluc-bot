@@ -3,6 +3,7 @@ FROM rust:slim-bullseye as base
 WORKDIR /usr/src/app
 
 ENV CI=true
+ENV RUSTFLAGS="-C target-cpu=native"
 
 RUN apt-get update && \
     apt-get upgrade -y --no-install-recommends && \
@@ -17,14 +18,18 @@ FROM base as builder
 
 COPY Cargo.lock .
 COPY Cargo.toml .
-COPY redis/ redis/
+
+RUN mkdir src && \
+    echo "// blank" > src/lib.rs && \
+    cargo build --release && \
+    rm -r src
+
 COPY src/ src/
 
-RUN cargo install --path .
+RUN cargo build --release
 
 FROM base as runner
 
-COPY --from=builder /usr/src/app/redis ./redis
-COPY --from=builder /usr/local/cargo/bin/diluc-bot /usr/local/bin/diluc-bot
+COPY --from=builder /usr/src/app/target/release/diluc-bot /usr/local/bin/diluc-bot
 
 ENTRYPOINT ["/usr/local/bin/diluc-bot"]
