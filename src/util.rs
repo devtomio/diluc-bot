@@ -32,3 +32,19 @@ where
         },
     }
 }
+
+pub async fn get_guild<G>(ctx: Context<'_>, guild_id: G) -> Result<serenity::Guild>
+where
+    G: Clone + Into<serenity::GuildId>,
+{
+    let cached = ctx.discord().cache.guild(guild_id.clone().into());
+
+    match cached {
+        Some(g) => Ok(g),
+        None => {
+            let _guild = ctx.discord().http.get_guild(guild_id.into().as_u64().to_owned()).await?;
+
+            Ok(cached.unwrap())
+        },
+    }
+}

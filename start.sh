@@ -6,6 +6,4 @@ done
 
 export ALL_PROXY=socks5://localhost:1055/
 
-echo "[Tailscale]: Started"
-
 /usr/local/bin/diluc-bot

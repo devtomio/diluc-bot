@@ -840,9 +840,9 @@ dependencies = [
 
 [[package]]
 name = "ipnet"
-version = "2.4.0"
+version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "35e70ee094dc02fd9c13fdad4940090f22dbd6ac7c9e7094a46cf0232a50bc7c"
+checksum = "879d54834c8c76457ef4293a689b2a8c59b076067ad77b15efafbb05f92a592b"
 
 [[package]]
 name = "itoa"
@@ -1256,7 +1256,7 @@ checksum = "1df8c4ec4b0627e53bdf214615ad287367e482558cf84b109250b37464dc03ae"
 [[package]]
 name = "poise"
 version = "0.1.0"
-source = "git+https://github.com/kangalioo/poise?branch=develop#71079fa0345d11214aa9850a3580569f56fb29af"
+source = "git+https://github.com/kangalioo/poise?branch=develop#95272a41730505ff760772a5681326923067776c"
 dependencies = [
  "async-trait",
  "derivative",
@@ -1273,7 +1273,7 @@ dependencies = [
 [[package]]
 name = "poise_macros"
 version = "0.1.0"
-source = "git+https://github.com/kangalioo/poise?branch=develop#71079fa0345d11214aa9850a3580569f56fb29af"
+source = "git+https://github.com/kangalioo/poise?branch=develop#95272a41730505ff760772a5681326923067776c"
 dependencies = [
  "darling 0.12.4",
  "proc-macro2",
@@ -1691,7 +1691,7 @@ dependencies = [
 [[package]]
 name = "serenity"
 version = "0.10.10"
-source = "git+https://github.com/devtomio/serenity?branch=next#6bab40c39d8dc32029d00821068e9f30090422ac"
+source = "git+https://github.com/devtomio/serenity?branch=next#1210f6aff15bb3924ccee0452f41b623f80de9d1"
 dependencies = [
  "async-trait",
  "async-tungstenite",

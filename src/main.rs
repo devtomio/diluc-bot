@@ -99,6 +99,7 @@ async fn main() {
 
     let framework = poise::Framework::build()
         .token(var("DISCORD_TOKEN").unwrap())
+        .intents(serenity::GatewayIntents::GUILDS)
         .user_data_setup(move |ctx, _ready, framework| {
             Box::pin(async move {
                 let commands = &framework.options().commands;

@@ -1,6 +1,6 @@
 use std::ops::Not;
 
-use chrono::{DateTime, NaiveDateTime, Utc};
+use chrono::Utc;
 use futures::stream::StreamExt;
 use futures::Stream;
 use mongodb::bson::{doc, Document};
@@ -133,7 +133,18 @@ pub async fn show(
         .await?;
 
     match tag {
-        Some(t) => ctx.say(t.get_str("content")?).await?,
+        Some(t) => {
+            ctx.send(|m| {
+                m.content(serenity::content_safe(
+                    ctx.discord(),
+                    t.get_str("content").unwrap(),
+                    &serenity::ContentSafeOptions::default(),
+                    &[],
+                ))
+                .allowed_mentions(|am| am.empty_parse())
+            })
+            .await?
+        },
         None => ctx.say("Sorry, that tag doesn't exist.").await?,
     };
 
@@ -295,15 +306,32 @@ pub async fn info(
                 get_member(ctx, ctx.guild_id().unwrap(), t.get_str("owner_id")?.parse::<u64>()?)
                     .await?;
 
+            let guild_id = t.get_str("guild_id").unwrap().parse::<u64>().unwrap();
+
+            let guild_icon = match ctx.discord().cache.guild(guild_id) {
+                Some(g) => g.icon_url().unwrap_or("https://res.cloudinary.com/https-guild-co/image/upload/v1610979476/https-guild-co/app-icon-app-store.png".to_owned()),
+                None => {
+                    let guild = ctx.discord().http.get_guild(guild_id).await.unwrap();
+
+                    guild.icon_url().unwrap_or("https://res.cloudinary.com/https-guild-co/image/upload/v1610979476/https-guild-co/app-icon-app-store.png".to_owned())
+                }
+            };
+
             ctx.send(|m| {
                 m.embed(|e| {
                     e.title(format!("**Tag __{}__**", t.get_str("name").unwrap()))
-                        .thumbnail(member.user.face())
-                        .description(t.get_str("content").unwrap())
-                        .timestamp(DateTime::<Utc>::from_utc(
-                            NaiveDateTime::from_timestamp(t.get_i64("created_at").unwrap(), 0),
-                            Utc,
-                        ))
+                        .thumbnail(guild_icon)
+                        .author(|a| a.name(member.user.tag()).icon_url(member.user.face()))
+                        .field(
+                            "Content Length",
+                            t.get_str("content").unwrap().chars().count(),
+                            true,
+                        )
+                        .field(
+                            "Created At",
+                            format!("<t:{}:f>", t.get_i64("created_at").unwrap() / 1000),
+                            true,
+                        )
                         .colour(serenity::Colour::RED)
                 })
             })
